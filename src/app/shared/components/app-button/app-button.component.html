@@ -1,0 +1,12 @@
+<button
+  type="button"
+  class="app-btn tap bebas"
+  [class.variant-gold]="variant === 'gold'"
+  [class.variant-ghost]="variant === 'ghost'"
+  [class.variant-grass]="variant === 'grass'"
+  [disabled]="disabled"
+  (click)="onClick($event)"
+>
+  <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
+  <ng-content></ng-content>
+</button>

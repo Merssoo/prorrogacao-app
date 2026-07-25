@@ -1,0 +1,33 @@
+.tile {
+  border-radius: var(--p-radius-xl);
+  padding: 15px 16px;
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+}
+
+.tile-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--p-card2);
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 17px;
+    color: var(--p-gold);
+  }
+}
+
+.tile-label {
+  color: var(--p-chalk);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tile-sub {
+  color: var(--p-muted);
+  font-size: 12px;
+  margin-top: 2px;
+}

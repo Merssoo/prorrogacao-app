@@ -1,0 +1,30 @@
+.field {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+  border-radius: var(--p-radius-lg);
+  padding: 14px 15px;
+  margin-bottom: 12px;
+
+  ion-icon {
+    font-size: 18px;
+    color: var(--p-muted);
+    flex-shrink: 0;
+  }
+
+  input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--p-chalk);
+    font-size: 15px;
+    width: 100%;
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--p-muted);
+    }
+  }
+}

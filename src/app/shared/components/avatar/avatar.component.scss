@@ -1,0 +1,19 @@
+.avatar {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: var(--p-card2);
+  color: var(--p-chalk);
+  border: 2px solid var(--p-pitch);
+
+  &.variant-gold {
+    background: var(--p-gold);
+    color: var(--p-ink);
+  }
+
+  &.variant-grass {
+    background: var(--p-grass);
+    color: var(--p-ink);
+  }
+}

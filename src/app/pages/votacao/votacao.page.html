@@ -1,0 +1,25 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="VOTAÇÃO DO JOGO" [showBack]="true" (back)="voltar()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="status-row">
+      <span class="event">Racha de sábado · 26 jul</span>
+      <span class="status">
+        <span class="dot"></span> ABERTA
+      </span>
+    </div>
+    <div class="subtitle">Formulário criado pelos conselheiros · encerra em 2h</div>
+
+    <app-vote-question [n]="1" label="Craque do jogo" [opts]="opts1" [value]="q1" [avatars]="true" (pick)="q1 = $event"></app-vote-question>
+    <app-vote-question [n]="2" label="Pé-frio da rodada 😅" [opts]="opts2" [value]="q2" [avatars]="true" (pick)="q2 = $event"></app-vote-question>
+    <app-vote-question [n]="3" label="Nota do racha (organização)" [opts]="opts3" [value]="q3" (pick)="q3 = $event"></app-vote-question>
+
+    <div class="cta">
+      <app-button icon="checkmark-outline">ENVIAR MEUS VOTOS</app-button>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,34 @@
+.summary-card {
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+  border-radius: var(--p-radius-xl);
+  padding: 14px 15px;
+
+  &.alert {
+    border-color: rgba(242, 107, 94, .33);
+  }
+}
+
+.label {
+  font-size: 9.5px;
+  letter-spacing: 1.2px;
+  color: var(--p-muted);
+  font-weight: 700;
+  margin-bottom: 7px;
+
+  .alert & {
+    color: var(--p-alert);
+  }
+}
+
+.value {
+  font-size: 26px;
+  color: var(--p-chalk);
+  line-height: .9;
+}
+
+.sub {
+  color: var(--p-muted);
+  font-size: 11.5px;
+  margin-top: 5px;
+}

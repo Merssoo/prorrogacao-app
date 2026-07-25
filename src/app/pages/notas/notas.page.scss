@@ -1,0 +1,69 @@
+.info-wrap {
+  margin-bottom: 18px;
+}
+
+.player-card {
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+  border-radius: var(--p-radius-lg);
+  padding: 14px 15px;
+  margin-bottom: 12px;
+}
+
+.player-top {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 12px;
+}
+
+.info {
+  flex: 1;
+}
+
+.name {
+  color: var(--p-chalk);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.meta {
+  color: var(--p-muted);
+  font-size: 11.5px;
+}
+
+.score {
+  text-align: center;
+
+  .value {
+    font-size: 26px;
+    color: var(--p-gold);
+    line-height: .9;
+  }
+
+  .label {
+    font-size: 9px;
+    color: var(--p-muted);
+  }
+}
+
+.rating {
+  display: flex;
+  gap: 4px;
+
+  button {
+    flex: 1;
+    height: 26px;
+    border-radius: 6px;
+    border: none;
+    background: var(--p-card2);
+    color: var(--p-muted);
+    font-size: 11px;
+    font-weight: 700;
+
+    &.on {
+      background: var(--p-gold);
+      color: var(--p-ink);
+    }
+  }
+}

@@ -1,0 +1,16 @@
+<div class="team-column">
+  <div class="header" [style.background]="team.cor + '12'">
+    <span class="bebas team-name" [style.color]="team.cor">{{ team.nome }}</span>
+    <span class="soma">Soma de notas <b class="bebas">{{ team.soma }}</b></span>
+  </div>
+  <div class="rows">
+    <div class="row" *ngFor="let p of team.players">
+      <span class="pos">{{ p.pos }}</span>
+      <span class="nome">{{ p.nome }}</span>
+      <span class="nota">
+        <ion-icon name="star" [style.color]="team.cor"></ion-icon>
+        <b class="bebas">{{ p.nota }}</b>
+      </span>
+    </div>
+  </div>
+</div>

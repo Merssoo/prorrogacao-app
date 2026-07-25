@@ -1,0 +1,7 @@
+<button
+  type="button"
+  class="chip tap"
+  [class.active]="active"
+  [class.grow]="grow"
+  (click)="selected.emit()"
+><ng-content></ng-content></button>

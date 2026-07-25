@@ -1,0 +1,35 @@
+.type-card {
+  border-radius: var(--p-radius-xl);
+  padding: 15px 14px;
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--p-muted);
+  }
+
+  .title {
+    color: var(--p-chalk);
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 10px;
+    line-height: 1.2;
+  }
+
+  .sub {
+    color: var(--p-muted);
+    font-size: 11.5px;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  &.active {
+    background: linear-gradient(180deg, #22301F, #18211A);
+    border-color: var(--p-gold);
+
+    ion-icon {
+      color: var(--p-gold);
+    }
+  }
+}

@@ -1,0 +1,76 @@
+.vote-question {
+  margin-bottom: 22px;
+}
+
+.heading {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+  margin-bottom: 11px;
+}
+
+.index {
+  font-size: 18px;
+  color: var(--p-gold);
+}
+
+.label {
+  color: var(--p-chalk);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border-radius: var(--p-radius-md);
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+  text-align: left;
+  width: 100%;
+
+  &.on {
+    background: rgba(245, 197, 66, .08);
+    border-color: var(--p-gold);
+  }
+}
+
+.text {
+  flex: 1;
+  color: var(--p-chalk);
+  font-size: 14px;
+  font-weight: 500;
+
+  &.strong {
+    font-weight: 700;
+  }
+}
+
+.radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border: 2px solid var(--p-line);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+
+  &.on {
+    border-color: var(--p-gold);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--p-gold);
+  }
+}

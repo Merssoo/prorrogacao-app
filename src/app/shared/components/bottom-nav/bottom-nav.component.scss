@@ -1,0 +1,39 @@
+.bottom-nav {
+  flex-shrink: 0;
+  height: 66px;
+  background: #111814;
+  border-top: 1px solid var(--p-line);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-bottom: 4px;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--p-muted);
+  }
+
+  span {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--p-muted);
+  }
+
+  &.on {
+    ion-icon {
+      color: var(--p-gold);
+    }
+    span {
+      font-weight: 700;
+      color: var(--p-gold);
+    }
+  }
+}

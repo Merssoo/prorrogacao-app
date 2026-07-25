@@ -1,0 +1,120 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+/**
+ * Prorrogação — estilos globais
+ * -----------------------------------------------------
+ */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  background: var(--p-pitch);
+}
+
+.bebas {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: .02em;
+}
+
+.tap {
+  transition: transform .12s ease, background .2s, box-shadow .2s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.tap:active {
+  transform: scale(.97);
+}
+
+.noscroll::-webkit-scrollbar {
+  display: none;
+}
+.noscroll {
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tap {
+    transition: none;
+  }
+}
+
+ion-content {
+  --padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Wrapper comum para o conteúdo de cada tela — centraliza e limita a
+   largura em telas grandes, mantendo a proporção de um app mobile. */
+.body {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 22px 24px;
+}
+.body.pad-lg {
+  padding: 0 26px 24px;
+}
+.body.pad-none-top {
+  padding-top: 0;
+}
+
+/* Cabeçalho/rodapé customizados substituem o toolbar nativo do Ionic —
+   removemos sombras/bordas padrão para bater com o visual do protótipo. */
+ion-header, ion-footer {
+  box-shadow: none;
+
+  &::after, &::before {
+    display: none !important;
+  }
+}
+
+/* Como o header não usa <ion-toolbar>, ele não ganha o respiro de área
+   segura automaticamente — sem isso o conteúdo fica atrás do notch/status
+   bar (iOS) ou da status bar do Android. O footer já resolve isso sozinho
+   via padding-bottom no app-bottom-nav (o fundo escuro cobre a área seg). */
+ion-header {
+  margin-top: env(safe-area-inset-top);
+}
+
+ion-header .header-wrap,
+ion-footer .footer-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+}
+

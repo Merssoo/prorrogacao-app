@@ -1,0 +1,39 @@
+.app-btn {
+  width: 100%;
+  border-radius: var(--p-radius-lg);
+  padding: 15px;
+  font-size: 20px;
+  letter-spacing: 1.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: none;
+
+  ion-icon {
+    font-size: 18px;
+  }
+
+  &:disabled {
+    opacity: .5;
+    pointer-events: none;
+  }
+
+  &.variant-gold {
+    background: var(--p-gold);
+    color: var(--p-ink);
+    box-shadow: 0 8px 20px -6px rgba(245, 197, 66, .5);
+  }
+
+  &.variant-ghost {
+    background: var(--p-card);
+    color: var(--p-chalk);
+    border: 1px solid var(--p-line);
+  }
+
+  &.variant-grass {
+    background: var(--p-card2);
+    color: var(--p-grass);
+    border: 1px solid var(--p-grass);
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "prorrogacao-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

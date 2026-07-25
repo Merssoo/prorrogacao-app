@@ -1,0 +1,22 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="TIMES SORTEADOS" [showBack]="true" (back)="voltar()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="info-wrap">
+      <app-info-box>
+        Sorteio balanceado por <b>posição</b> e <b>nota individual</b>. Diferença entre os times: <b style="color: var(--p-grass)">1 ponto</b>.
+      </app-info-box>
+    </div>
+
+    <app-team-column [team]="timeA"></app-team-column>
+    <div class="spacer-14"></div>
+    <app-team-column [team]="timeB"></app-team-column>
+    <div class="spacer-18"></div>
+
+    <app-button variant="ghost" icon="shuffle-outline">REFAZER SORTEIO</app-button>
+  </div>
+</ion-content>

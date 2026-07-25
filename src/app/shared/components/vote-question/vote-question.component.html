@@ -1,0 +1,21 @@
+<div class="vote-question">
+  <div class="heading">
+    <span class="bebas index">{{ numberLabel }}</span>
+    <span class="label">{{ label }}</span>
+  </div>
+  <div class="options">
+    <button
+      type="button"
+      class="option tap"
+      *ngFor="let o of opts"
+      [class.on]="o === value"
+      (click)="pick.emit(o)"
+    >
+      <app-avatar *ngIf="avatars" [label]="initials(o)" [size]="30" [variant]="o === value ? 'gold' : 'default'"></app-avatar>
+      <span class="text" [class.strong]="o === value">{{ o }}</span>
+      <span class="radio" [class.on]="o === value">
+        <span class="dot" *ngIf="o === value"></span>
+      </span>
+    </button>
+  </div>
+</div>

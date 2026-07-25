@@ -1,0 +1,25 @@
+.info-box {
+  background: var(--p-card);
+  border: 1px solid var(--p-line);
+  border-radius: var(--p-radius-lg);
+  padding: 13px 15px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+
+  ion-icon {
+    font-size: 16px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .text {
+    color: var(--p-muted);
+    font-size: 12.5px;
+    line-height: 1.5;
+
+    ::ng-deep b {
+      color: var(--p-chalk);
+    }
+  }
+}

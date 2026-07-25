@@ -1,0 +1,52 @@
+// Prorrogação — design tokens
+// Paleta extraída do protótipo (docs/varzea-app-prototipo.jsx)
+
+:root {
+  --p-pitch: #0E1410;
+  --p-card: #18211B;
+  --p-card2: #1F2A22;
+  --p-line: #2C3A30;
+  --p-chalk: #EDF1EA;
+  --p-muted: #8A968C;
+  --p-gold: #F5C542;
+  --p-gold-dark: #E0A81E;
+  --p-grass: #5FCB7E;
+  --p-alert: #F26B5E;
+  --p-ink: #1A1206;
+  --p-blue: #8FB4FF;
+
+  --p-radius-sm: 8px;
+  --p-radius-md: 12px;
+  --p-radius-lg: 14px;
+  --p-radius-xl: 16px;
+  --p-radius-xxl: 22px;
+
+  /* Ionic overrides — o app inteiro roda no tema escuro "campo" */
+  --ion-background-color: var(--p-pitch);
+  --ion-background-color-rgb: 14, 20, 16;
+  --ion-text-color: var(--p-chalk);
+  --ion-text-color-rgb: 237, 241, 234;
+
+  --ion-color-primary: var(--p-gold);
+  --ion-color-primary-rgb: 245, 197, 66;
+  --ion-color-primary-contrast: var(--p-ink);
+  --ion-color-primary-contrast-rgb: 26, 18, 6;
+  --ion-color-primary-shade: var(--p-gold-dark);
+  --ion-color-primary-tint: #f6cd5c;
+
+  --ion-toolbar-background: var(--p-pitch);
+  --ion-item-background: transparent;
+  --ion-border-color: var(--p-line);
+
+  --ion-font-family: 'Inter', system-ui, sans-serif;
+}
+
+ion-content {
+  --background: var(--p-pitch);
+  --color: var(--p-chalk);
+}
+
+ion-header, ion-footer {
+  background: var(--p-pitch);
+}
+

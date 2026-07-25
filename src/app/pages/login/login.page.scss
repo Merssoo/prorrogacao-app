@@ -1,0 +1,55 @@
+.brand {
+  text-align: center;
+  margin: 34px 0 30px;
+  /* login não usa <ion-header>, então precisa do próprio respiro de
+     área segura para não ficar atrás do notch/status bar. */
+  margin-top: calc(34px + env(safe-area-inset-top));
+}
+
+.logo {
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #F5C542, #E0A81E);
+  box-shadow: 0 10px 26px -8px rgba(245, 197, 66, .6);
+
+  span {
+    font-size: 30px;
+    color: var(--p-ink);
+  }
+}
+
+.title {
+  font-size: clamp(28px, 9vw, 40px);
+  color: var(--p-chalk);
+  line-height: .9;
+}
+
+.subtitle {
+  color: var(--p-muted);
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.forgot {
+  text-align: right;
+  margin-bottom: 18px;
+  color: var(--p-muted);
+  font-size: 12.5px;
+}
+
+.switch {
+  text-align: center;
+  margin-top: 22px;
+  color: var(--p-muted);
+  font-size: 13.5px;
+}
+
+.link {
+  color: var(--p-gold);
+  font-weight: 700;
+  margin-left: 4px;
+}
