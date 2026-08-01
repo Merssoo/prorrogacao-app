@@ -4,9 +4,13 @@
   [class.variant-gold]="variant === 'gold'"
   [class.variant-ghost]="variant === 'ghost'"
   [class.variant-grass]="variant === 'grass'"
-  [disabled]="disabled"
+  [class.is-loading]="loading"
+  [disabled]="disabled || loading"
   (click)="onClick($event)"
 >
-  <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
-  <ng-content></ng-content>
+  <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+  <ng-container *ngIf="!loading">
+    <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
+    <ng-content></ng-content>
+  </ng-container>
 </button>

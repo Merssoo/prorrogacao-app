@@ -88,7 +88,12 @@ export class AuthService {
     );
   }
 
-  register(data: { name: string; email: string; password: string }): Observable<{ message?: string }> {
+  register(data: {
+    name: string;
+    email: string;
+    password: string;
+    acceptedTerms: boolean;
+  }): Observable<{ message?: string }> {
     return this.apiService.post(`${this.authEndpoint}/register`, data);
   }
 

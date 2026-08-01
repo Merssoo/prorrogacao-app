@@ -176,7 +176,7 @@ nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra f
 
 | Endpoint | Body | Resposta 2xx |
 |---|---|---|
-| `POST /auth/register` | `{ name, email, password }` | `{ message? }` |
+| `POST /auth/register` | `{ name, email, password, acceptedTerms }` | `{ message? }` |
 | `POST /auth/verify-email` | `{ email, code }` | `{ message? }` |
 | `POST /auth/resend-code` | `{ email }` | `{ message? }` |
 | `POST /auth/login` | `{ email, password }` | `{ accessToken, refreshToken, profileCreated }` |
@@ -191,6 +191,38 @@ nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra f
 - `/auth/refresh-token` **rotaciona** o refresh token a cada uso (retorna um novo par) — combina com
   a decisão de multi-device: só o refresh token usado é substituído, os outros devices do mesmo
   usuário continuam válidos.
+- **`acceptedTerms`** (boolean): a tela de cadastro (`register.page.ts`) só envia `true` — o botão
+  "LI E ACEITO OS TERMOS" no modal de termos (`(pressed)="acceptTerms(termsModal)"`) só habilita
+  depois que o usuário rola o texto até o fim (`hasReadTermsToBottom`, via `onTermsScroll`); sem
+  isso, `submit()` bloqueia o cadastro no próprio front com toast, sem nem chamar a API. Padrão
+  adaptado do `beseen-app` (`signup.page.ts`/`.html`), que faz o mesmo scroll-gate. **Diferença
+  deliberada do BeSeen**: lá o back tem `@AssertTrue` no DTO de registro (`UserRegistration`) que
+  rejeita `acceptedTerms: false` com 400 — o `prorrogacao-api` deve replicar essa validação
+  server-side (não confiar só no front) quando o módulo `auth` for implementado, persistindo como
+  `boolean acceptedTerms` numa coluna simples na entidade de usuário (sem entidade/versão de termos
+  separada — BeSeen também não tem isso). O texto dos termos exibido no modal é **provisório**
+  (placeholder adaptado ao domínio do Prorrogação) e precisa ser revisado/substituído antes do
+  lançamento — não existe endpoint pra buscar o texto/versão dos termos, é estático no template
+  (`register.page.html`), igual ao padrão do BeSeen.
+- **Validação client-side no cadastro** (`register.page.ts`, sessão 2026-08-01): e-mail por regex
+  (`EMAIL_PATTERN`), senha com **mínimo 8 caracteres** (`MIN_PASSWORD_LENGTH`), confirmação de senha
+  igual à senha, nome não vazio, e `acceptedTerms` true — todos via getters (`isFormValid`) sem
+  Reactive Forms (o app usa binding simples `[(value)]` no `app-field`, não `FormGroup`). O botão
+  "CONTINUAR" fica `[disabled]` até `isFormValid`. **Isso é só UX, não substitui validação
+  server-side** — o `prorrogacao-api` precisa validar de novo (mínimo de senha, formato de e-mail
+  etc.) quando o endpoint `/auth/register` for implementado, mesma lógica do item acima sobre
+  `acceptedTerms`.
+- **Erro de rede/API fora do ar tratado no `authInterceptor`** (sessão 2026-08-01): antes, requests
+  pros paths públicos de auth (`/auth/register`, `/auth/login`, etc.) passavam batido pelo
+  interceptor sem nenhum `catchError` — quando a API está fora do ar, o Angular retorna
+  `HttpErrorResponse` com `status === 0` e sem corpo, e cada página caía no texto de fallback
+  genérico (`getErrorMessage(error, 'Não foi possível criar a conta...')`), confundindo "API fora
+  do ar" com qualquer outro erro de negócio. Agora o interceptor detecta `status === 0` (rede
+  indisponível, servidor fora do ar, CORS bloqueado — o browser não distingue os três) **pra
+  qualquer request de `environment.apiUrl`**, autenticada ou não, e reescreve o erro com
+  `error.error.message` = "Não foi possível conectar ao servidor. Verifique sua internet e tente
+  novamente em instantes." — como `getErrorMessage` (`http-error.util.ts`) já lê esse campo, todas
+  as páginas mostram a mensagem certa automaticamente, sem precisar de lógica própria por tela.
 
 ### Próximo passo combinado
 

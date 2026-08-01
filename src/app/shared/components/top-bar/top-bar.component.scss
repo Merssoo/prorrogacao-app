@@ -2,7 +2,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 4px 18px 12px;
+  // `ion-header` já empurra pelo safe-area-inset-top (notch/status bar) — este
+  // padding é o respiro visual além disso, pra seta/título não colarem na borda.
+  padding: 14px calc(18px + env(safe-area-inset-right)) 12px calc(18px + env(safe-area-inset-left));
   flex-shrink: 0;
 }
 

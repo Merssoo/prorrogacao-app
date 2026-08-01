@@ -15,7 +15,7 @@
       <span>Esqueci minha senha</span>
     </div>
 
-    <app-button icon="checkmark-outline" (pressed)="login()">ENTRAR</app-button>
+    <app-button icon="checkmark-outline" [loading]="loading" (pressed)="login()">ENTRAR</app-button>
 
     <div class="switch">
       Não tem conta?

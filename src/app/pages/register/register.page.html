@@ -8,13 +8,53 @@
   <div class="body">
     <p class="intro">Preencha seus dados. Vamos enviar um código de confirmação para seu e-mail.</p>
 
-    <app-field icon="person-outline" placeholder="Nome completo" [(value)]="name"></app-field>
-    <app-field icon="mail-outline" placeholder="E-mail" type="email" [(value)]="email"></app-field>
-    <app-field icon="lock-closed-outline" placeholder="Senha" type="password" [(value)]="password"></app-field>
-    <app-field icon="lock-closed-outline" placeholder="Confirmar senha" type="password" [(value)]="confirmPassword"></app-field>
+    <app-field
+      icon="person-outline"
+      placeholder="Nome completo"
+      [(value)]="name"
+      [error]="nameError"
+      (blurred)="nameTouched = true"
+    ></app-field>
+    <app-field
+      icon="mail-outline"
+      placeholder="E-mail"
+      type="email"
+      [(value)]="email"
+      [error]="emailError"
+      (blurred)="emailTouched = true"
+    ></app-field>
+    <app-field
+      icon="lock-closed-outline"
+      placeholder="Senha"
+      type="password"
+      [(value)]="password"
+      [error]="passwordError"
+      (blurred)="passwordTouched = true"
+    ></app-field>
+    <app-field
+      icon="lock-closed-outline"
+      placeholder="Confirmar senha"
+      type="password"
+      [(value)]="confirmPassword"
+      [error]="confirmPasswordError"
+      (blurred)="confirmPasswordTouched = true"
+    ></app-field>
+
+    <div class="terms-row">
+      <ion-checkbox
+        [checked]="acceptedTerms"
+        tabindex="-1"
+        labelPlacement="end"
+        justify="start"
+        class="terms-checkbox"
+      >
+        <span class="terms-text">Eu aceito os <span class="link">Termos de Uso e Privacidade</span></span>
+      </ion-checkbox>
+      <div id="open-terms-modal" class="terms-click-overlay"></div>
+    </div>
 
     <div class="cta">
-      <app-button icon="chevron-forward-outline" (pressed)="submit()">CONTINUAR</app-button>
+      <app-button icon="chevron-forward-outline" [disabled]="!isFormValid" [loading]="loading" (pressed)="submit()">CONTINUAR</app-button>
     </div>
 
     <div class="switch">
@@ -23,3 +63,45 @@
     </div>
   </div>
 </ion-content>
+
+<ion-modal trigger="open-terms-modal" #termsModal class="terms-modal" (ionWillPresent)="resetTermsScroll()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <div class="header-wrap terms-header">
+        <span class="bebas title">TERMOS DE USO</span>
+        <div class="close-btn tap" (click)="termsModal.dismiss()">
+          <ion-icon name="close-outline"></ion-icon>
+        </div>
+      </div>
+    </ion-header>
+    <ion-content (ionScroll)="onTermsScroll($event)" [scrollEvents]="true" class="terms-content">
+      <div class="terms-text-body">
+
+        <h3>1. Sobre o Prorrogação</h3>
+        <p>O <strong>Prorrogação</strong> é uma plataforma de gestão de times de futebol de várzea. Ao criar uma conta, você poderá participar de times, confirmar presença em jogos, e — dependendo do seu papel no time — organizar eventos, avaliar atletas e acompanhar o financeiro do grupo.</p>
+
+        <h3>2. Proteção de Dados (LGPD)</h3>
+        <p>Em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD)</strong>, coletamos dados como nome, e-mail, dados do seu perfil de atleta (posição, pé dominante, número de camisa) e, quando aplicável, informações de mensalidade e pagamento do seu time. Esses dados são usados exclusivamente para o funcionamento do app e não são vendidos a terceiros.</p>
+
+        <h3>3. Papéis e Visibilidade dentro do Time</h3>
+        <p>Presidentes, tesoureiros e conselheiros do seu time podem ter acesso a informações adicionais sobre você dentro do grupo — como notas de avaliação e status de mensalidade — conforme as permissões de cada papel.</p>
+
+        <h3>4. Conduta</h3>
+        <p>É proibido usar o app para conteúdo ofensivo, discurso de ódio ou assédio a outros membros do time, inclusive em formulários de votação e comentários. Violações podem resultar em suspensão da conta.</p>
+
+        <h3>5. Limitação de Responsabilidade</h3>
+        <p>O Prorrogação é uma ferramenta de organização. Não nos responsabilizamos por lesões, disputas financeiras entre membros do time ou combinados feitos fora da plataforma.</p>
+
+        <div class="scroll-finish-indicator" *ngIf="!hasReadTermsToBottom">
+          <ion-icon name="arrow-down-outline"></ion-icon>
+          <span>Role até o fim para aceitar</span>
+        </div>
+      </div>
+    </ion-content>
+    <ion-footer class="ion-no-border">
+      <div class="footer-wrap terms-footer">
+        <app-button [disabled]="!hasReadTermsToBottom" (pressed)="acceptTerms(termsModal)">LI E ACEITO OS TERMOS</app-button>
+      </div>
+    </ion-footer>
+  </ng-template>
+</ion-modal>

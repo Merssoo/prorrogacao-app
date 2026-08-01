@@ -18,23 +18,37 @@
 
     <div class="digits">
       <input
-        *ngFor="let d of digits; let i = index"
+        *ngFor="let d of digits; let i = index; trackBy: trackByIndex"
+        #digitInput
         [value]="d"
-        (input)="setDigit(i, $any($event.target).value)"
+        (input)="onDigitInput(i, $event)"
+        (keydown)="onDigitKeydown(i, $event)"
+        (paste)="onDigitsPaste($event)"
+        type="text"
         inputmode="numeric"
+        autocomplete="one-time-code"
+        pattern="[0-9]*"
         maxlength="1"
         [class.filled]="d"
       />
     </div>
 
-    <app-button icon="checkmark-outline" (pressed)="confirm()">CONFIRMAR</app-button>
+    <app-button icon="checkmark-outline" [loading]="loading" (pressed)="confirm()">CONFIRMAR</app-button>
 
     <div class="resend">
       <ng-container *ngIf="secondsUntilResend > 0; else canResend">
         Reenviar código em <b>{{ timeUntilResend }}</b>
       </ng-container>
       <ng-template #canResend>
-        <span class="tap link" (click)="resend()">Reenviar código</span>
+        <ng-container *ngIf="resending; else resendLink">
+          <span class="resend-sending">
+            <ion-spinner name="crescent"></ion-spinner>
+            Enviando novo código...
+          </span>
+        </ng-container>
+        <ng-template #resendLink>
+          <span class="tap link" (click)="resend()">Reenviar código</span>
+        </ng-template>
       </ng-template>
     </div>
   </div>

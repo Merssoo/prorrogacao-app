@@ -1,9 +1,17 @@
-<div class="field">
+<div class="field" [class.has-error]="error">
   <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
   <input
-    [type]="type"
+    [type]="inputType"
     [placeholder]="placeholder"
     [ngModel]="value"
     (ngModelChange)="valueChange.emit($event)"
+    (blur)="blurred.emit()"
   />
+  <ion-icon
+    *ngIf="type === 'password'"
+    class="toggle-icon tap"
+    [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+    (click)="togglePasswordVisibility()"
+  ></ion-icon>
 </div>
+<div class="field-error" *ngIf="error">{{ error }}</div>

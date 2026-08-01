@@ -65,3 +65,14 @@
     color: var(--p-chalk);
   }
 }
+
+.resend-sending {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  ion-spinner {
+    width: 14px;
+    height: 14px;
+  }
+}

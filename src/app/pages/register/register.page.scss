@@ -21,3 +21,108 @@
   font-weight: 700;
   margin-left: 4px;
 }
+
+.terms-row {
+  position: relative;
+  margin: 4px 0 4px;
+}
+
+.terms-checkbox {
+  --size: 20px;
+  --checkbox-background-checked: var(--p-gold);
+  --border-color-checked: var(--p-gold);
+  font-size: 13.5px;
+  // Só decorativo — reflete `acceptedTerms`, mas quem controla a interação é o
+  // overlay abaixo. Sem isso o clique marca o check direto, sem abrir o modal.
+  pointer-events: none;
+
+  .terms-text {
+    color: var(--p-muted);
+    margin-left: 8px;
+
+    .link {
+      margin-left: 0;
+    }
+  }
+}
+
+.terms-click-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.terms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  // ion-header já soma o safe-area-inset-top — isto é o respiro visual além disso,
+  // e as laterais evitam que título/botão de fechar colem nas bordas da tela.
+  padding: 14px calc(18px + env(safe-area-inset-right)) 12px calc(18px + env(safe-area-inset-left));
+
+  .title {
+    font-size: 20px;
+  }
+
+  .close-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--p-card);
+    font-size: 18px;
+  }
+}
+
+.terms-content {
+  --background: var(--p-pitch);
+}
+
+.terms-text-body {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 4px calc(22px + env(safe-area-inset-right)) 32px calc(22px + env(safe-area-inset-left));
+  color: var(--p-chalk);
+  font-size: 14px;
+  line-height: 1.6;
+
+  h3 {
+    color: var(--p-gold);
+    font-size: 15px;
+    margin: 20px 0 6px;
+  }
+
+  p, ul {
+    color: var(--p-muted);
+    margin: 0 0 10px;
+  }
+
+  a {
+    color: var(--p-gold);
+  }
+
+  .terms-draft-notice {
+    color: var(--p-alert);
+    font-style: italic;
+    font-size: 12.5px;
+  }
+}
+
+.scroll-finish-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--p-gold);
+  font-size: 12.5px;
+  margin-top: 12px;
+}
+
+.terms-footer {
+  padding: 12px calc(22px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))
+    calc(22px + env(safe-area-inset-left));
+}

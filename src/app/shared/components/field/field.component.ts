@@ -11,5 +11,18 @@ export class FieldComponent {
   @Input() placeholder = '';
   @Input() type: 'text' | 'email' | 'password' | 'number' = 'text';
   @Input() value = '';
+  @Input() error: string | null = null;
   @Output() valueChange = new EventEmitter<string>();
+  @Output() blurred = new EventEmitter<void>();
+
+  showPassword = false;
+
+  get inputType(): string {
+    if (this.type !== 'password') return this.type;
+    return this.showPassword ? 'text' : 'password';
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 }

@@ -12,10 +12,11 @@ export class AppButtonComponent {
   @Input() variant: ButtonVariant = 'gold';
   @Input() icon?: string;
   @Input() disabled = false;
+  @Input() loading = false;
   @Output() pressed = new EventEmitter<MouseEvent>();
 
   onClick(event: MouseEvent): void {
-    if (this.disabled) {
+    if (this.disabled || this.loading) {
       return;
     }
     this.pressed.emit(event);

@@ -7,11 +7,16 @@
   border-radius: var(--p-radius-lg);
   padding: 14px 15px;
   margin-bottom: 12px;
+  transition: border-color .15s ease, margin-bottom .15s ease;
 
   ion-icon {
     font-size: 18px;
     color: var(--p-muted);
     flex-shrink: 0;
+  }
+
+  .toggle-icon {
+    cursor: pointer;
   }
 
   input {
@@ -27,4 +32,15 @@
       color: var(--p-muted);
     }
   }
+
+  &.has-error {
+    border-color: var(--p-alert);
+    margin-bottom: 4px;
+  }
+}
+
+.field-error {
+  color: var(--p-alert);
+  font-size: 12px;
+  margin: 0 2px 12px;
 }
