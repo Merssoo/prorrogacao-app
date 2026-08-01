@@ -9,17 +9,17 @@
     </div>
 
     <app-field icon="mail-outline" placeholder="E-mail" type="email" [(value)]="email"></app-field>
-    <app-field icon="lock-closed-outline" placeholder="Senha" type="password" [(value)]="senha"></app-field>
+    <app-field icon="lock-closed-outline" placeholder="Senha" type="password" [(value)]="password"></app-field>
 
     <div class="forgot">
       <span>Esqueci minha senha</span>
     </div>
 
-    <app-button icon="checkmark-outline" (pressed)="entrar()">ENTRAR</app-button>
+    <app-button icon="checkmark-outline" (pressed)="login()">ENTRAR</app-button>
 
     <div class="switch">
       Não tem conta?
-      <span class="tap link" (click)="irParaCadastro()">Criar conta</span>
+      <span class="tap link" (click)="goToRegister()">Criar conta</span>
     </div>
   </div>
 </ion-content>

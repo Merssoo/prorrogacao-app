@@ -8,38 +8,38 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  presencaConfirmada = false;
+  attendanceConfirmed = false;
 
-  readonly avatares = ['MG', 'TÔ', 'JR', 'PH', 'CA'];
+  readonly avatars = ['MG', 'TÔ', 'JR', 'PH', 'CA'];
 
   constructor(private readonly router: Router) {}
 
-  irParaEvento(): void {
-    this.router.navigateByUrl('/evento');
+  goToEvent(): void {
+    this.router.navigateByUrl('/event');
   }
 
-  irParaCriarEvento(): void {
-    this.router.navigateByUrl('/criar-evento');
+  goToCreateEvent(): void {
+    this.router.navigateByUrl('/create-event');
   }
 
-  irParaNotas(): void {
-    this.router.navigateByUrl('/notas');
+  goToRatings(): void {
+    this.router.navigateByUrl('/ratings');
   }
 
-  irParaVotacao(): void {
-    this.router.navigateByUrl('/votacao');
+  goToVoting(): void {
+    this.router.navigateByUrl('/voting');
   }
 
-  irParaSorteio(): void {
-    this.router.navigateByUrl('/sorteio');
+  goToDraft(): void {
+    this.router.navigateByUrl('/draft');
   }
 
-  irParaFinanceiro(): void {
-    this.router.navigateByUrl('/financeiro');
+  goToFinance(): void {
+    this.router.navigateByUrl('/finance');
   }
 
-  alternarPresenca(event: Event): void {
+  toggleAttendance(event: Event): void {
     event.stopPropagation();
-    this.presencaConfirmada = !this.presencaConfirmada;
+    this.attendanceConfirmed = !this.attendanceConfirmed;
   }
 }

@@ -1,0 +1,25 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="CRIAR CONTA" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <p class="intro">Preencha seus dados. Vamos enviar um código de confirmação para seu e-mail.</p>
+
+    <app-field icon="person-outline" placeholder="Nome completo" [(value)]="name"></app-field>
+    <app-field icon="mail-outline" placeholder="E-mail" type="email" [(value)]="email"></app-field>
+    <app-field icon="lock-closed-outline" placeholder="Senha" type="password" [(value)]="password"></app-field>
+    <app-field icon="lock-closed-outline" placeholder="Confirmar senha" type="password" [(value)]="confirmPassword"></app-field>
+
+    <div class="cta">
+      <app-button icon="chevron-forward-outline" (pressed)="submit()">CONTINUAR</app-button>
+    </div>
+
+    <div class="switch">
+      Já tem conta?
+      <span class="tap link" (click)="goBack()">Entrar</span>
+    </div>
+  </div>
+</ion-content>

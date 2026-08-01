@@ -6,6 +6,23 @@ Fontes de verdade em `/docs`:
 - `prorrogacao-documentacao-tecnica.md` — domínio, regras de negócio, ER, endpoints REST rascunho.
 - `prorrogacao-app-prototipo.jsx` — protótipo visual (mockup, não produção).
 
+## Convenção de nomenclatura (obrigatória)
+
+Em `prorrogacao-api` e `prorrogacao-app`, **tudo que é código fica em inglês**: nomes de arquivo,
+pasta, classe, seletor de componente, rota de URL, método, variável, campo de DTO/interface e path
+de endpoint REST. **Só o que é exibido na UI para o usuário final fica em português** (labels,
+mensagens de erro/toast, texto de botão, placeholder).
+
+O `prorrogacao-app` (front) já foi renomeado seguindo essa convenção (sessão 2026-08-01) — páginas,
+serviços, guard, interceptor e o contrato de API assumido pelo front estão em inglês (ver seção
+"Estado atual" abaixo). **Atenção:** `docs/prorrogacao-documentacao-tecnica.md` (ER, diagrama de
+classes, enums do domínio, tabela de endpoints da seção 6) **continua em português** — ainda não foi
+traduzido. Ou seja, hoje o front usa nomes/enums em inglês (`PRESIDENT`, `PAID`, `INTERNAL`...) que
+não batem literalmente com o doc técnico (`PRESIDENTE`, `PAGO`, `INTERNO`...). Ao implementar o
+`prorrogacao-api`, seguir a convenção em inglês (não replicar os nomes em português do doc técnico
+nas entidades/DTOs/enums Java) — o doc técnico serve pra regra de negócio e modelagem, não pra
+nomenclatura literal de código.
+
 O doc técnico já define auth via JWT (access + refresh token), mas sem detalhar implementação.
 As seções abaixo documentam um padrão de referência estudado no projeto irmão **beseen-app/beseen-api**
 (`/home/emerson/Documentos/beseen`), para reaproveitar quando implementarmos auth aqui. Adaptar, não
@@ -123,7 +140,7 @@ cobrir os dois sem duas implementações divergentes de auth.
   Só há logout forçado quando o próprio refresh token é rejeitado pela API (expirado/revogado) — ver
   divergências do BeSeen acima.
 
-## Estado atual: front de auth implementado (2026-07-24), backend ainda não existe
+## Estado atual: front de auth implementado (2026-07-24), renomeado pra inglês (2026-08-01), backend ainda não existe
 
 O front (`prorrogacao-app`) já tem toda a fiação de auth abaixo pronta e buildando (`ng build`
 passou limpo). O `prorrogacao-api` continua só o esqueleto do Spring Initializr (nenhuma entidade,
@@ -132,38 +149,44 @@ assumir que algo mudou, checar se esses arquivos ainda existem e bater com a des
 
 - `src/app/services/secure-storage.service.ts` — abstração de storage (ver seção acima).
 - `src/app/services/api.service.ts` — wrapper fino de `HttpClient` com `environment.apiUrl`.
-- `src/app/services/auth.service.ts` — login/cadastro/verificarEmail/reenviarCodigo/refresh/logout.
+- `src/app/services/auth.service.ts` — login/register/verifyEmail/resendCode/refresh/logout.
 - `src/app/interceptors/auth.interceptor.ts` — anexa Bearer token, refresh proativo/reativo.
 - `src/app/guards/auth.guard.ts` — só autenticação, aplicado em `app-routing.module.ts` nas rotas
-  `perfil`, `home`, `criar-evento`, `evento`, `sorteio`, `notas`, `votacao`, `financeiro`.
-- `src/app/shared/http-error.util.ts` — extrai `error.error.message` da resposta HTTP com fallback.
+  `profile`, `home`, `create-event`, `event`, `draft`, `ratings`, `voting`, `finance`.
+- `src/app/shared/http-error.util.ts` — extrai `error.error.message` da resposta HTTP com fallback
+  (`getErrorMessage`).
 - `app.module.ts` — `provideHttpClient(withInterceptors([authInterceptor]))` +
   `provideAppInitializer` chamando `AuthService.initialize()` (restaura/renova sessão no boot —
   essencial na web, onde o access token não sobrevive a um reload).
 - `environment.ts` / `environment.prod.ts` — `apiUrl` (`http://localhost:8080` em dev; o valor de
   prod é só um placeholder, ajustar quando existir domínio real).
-- Páginas `login`, `cadastro`, `codigo` já chamam o `AuthService` de verdade (antes só navegavam
-  entre telas sem chamar API nenhuma).
+- Páginas `login`, `register` (pasta, era `cadastro`), `verify-email` (pasta, era `codigo`) já
+  chamam o `AuthService` de verdade (antes só navegavam entre telas sem chamar API nenhuma).
+- Demais páginas (todas renomeadas de português pra inglês na sessão 2026-08-01 — pasta, classe,
+  seletor e rota): `home`, `profile` (era `perfil`), `create-event` (era `criar-evento`), `event`
+  (era `evento`), `draft` (era `sorteio`), `ratings` (era `notas`), `voting` (era `votacao`),
+  `finance` (era `financeiro`) — ainda são só mock/UI, sem chamada de API real.
 
 ### Contrato de API assumido pelo front (rascunho — implementar no `prorrogacao-api` a seguir)
 
 Esses formatos foram inventados pelo front na ausência de um backend — **não são spec fechada**,
 só o que precisa bater quando o módulo `auth` do Spring Boot for implementado. Ajustar aqui se o
-contrato mudar durante a implementação do backend.
+contrato mudar durante a implementação do backend. Nomes de campo em inglês (ver "Convenção de
+nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra ficam em português.
 
 | Endpoint | Body | Resposta 2xx |
 |---|---|---|
-| `POST /auth/cadastro` | `{ nome, email, senha }` | `{ mensagem? }` |
-| `POST /auth/verificar-email` | `{ email, codigo }` | `{ mensagem? }` |
-| `POST /auth/reenviar-codigo` | `{ email }` | `{ mensagem? }` |
-| `POST /auth/login` | `{ email, senha }` | `{ accessToken, refreshToken, perfilCriado }` |
+| `POST /auth/register` | `{ name, email, password }` | `{ message? }` |
+| `POST /auth/verify-email` | `{ email, code }` | `{ message? }` |
+| `POST /auth/resend-code` | `{ email }` | `{ message? }` |
+| `POST /auth/login` | `{ email, password }` | `{ accessToken, refreshToken, profileCreated }` |
 | `POST /auth/refresh-token` | `{ refreshToken }` | `{ accessToken, refreshToken }` |
 
 - Erros: front lê `error.error.message` (corpo JSON com campo `message`) pra mostrar no toast; sem
   esse campo cai num texto genérico fixo por tela.
-- `perfilCriado` no login decide se o front manda o usuário pra `/perfil` (criar perfil de atleta)
-  ou `/home`.
-- Claims do access token (JWT) que o front decodifica: `sub` (id do usuário), `nome`, `email`,
+- `profileCreated` no login decide se o front manda o usuário pra `/profile` (criar perfil de
+  atleta) ou `/home`.
+- Claims do access token (JWT) que o front decodifica: `sub` (id do usuário), `name`, `email`,
   `exp`, `iat` — nada de papel/role embutido (ver "Decisões já tomadas", item 3).
 - `/auth/refresh-token` **rotaciona** o refresh token a cada uso (retorna um novo par) — combina com
   a decisão de multi-device: só o refresh token usado é substituído, os outros devices do mesmo

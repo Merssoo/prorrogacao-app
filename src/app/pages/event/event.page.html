@@ -1,0 +1,37 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="DETALHES DO JOGO" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="tag">
+      <ion-icon name="shuffle-outline"></ion-icon> RACHA INTERNO
+    </div>
+    <div class="bebas title">RACHA DE SÁBADO</div>
+    <div class="meta">
+      <span><ion-icon name="calendar-outline"></ion-icon> Sáb · 26 jul · 15h</span>
+      <span><ion-icon name="location-outline"></ion-icon> Campo do Zé Pretão</span>
+    </div>
+
+    <div class="spots-card">
+      <div class="row">
+        <span class="label">Vagas preenchidas</span>
+        <span class="bebas value">16<span class="total">/20</span></span>
+      </div>
+      <div class="bar">
+        <div class="fill"></div>
+      </div>
+    </div>
+
+    <app-button variant="grass" icon="checkmark-outline">VOCÊ CONFIRMOU PRESENÇA</app-button>
+    <div class="spacer"></div>
+    <div (click)="goToDraft()">
+      <app-button variant="gold" icon="shuffle-outline">SORTEAR TIMES</app-button>
+    </div>
+
+    <app-player-group title="CONFIRMADOS" color="var(--p-grass)" [players]="confirmed"></app-player-group>
+    <app-player-group title="DÚVIDA" color="var(--p-gold)" [players]="maybe"></app-player-group>
+  </div>
+</ion-content>

@@ -7,7 +7,7 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./player-row.component.scss'],
 })
 export class PlayerRowComponent {
-  @Input() nome = '';
+  @Input() name = '';
   @Input() pos = '';
-  @Input() ini = '';
+  @Input() initials = '';
 }

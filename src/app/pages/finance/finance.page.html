@@ -1,0 +1,46 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="MENSALIDADES" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="summary-grid">
+      <app-summary-card label="ARRECADADO · JUL" value="R$ 780" sub="de R$ 1.020"></app-summary-card>
+      <app-summary-card label="PENDENTE · JUL" value="R$ 240" sub="4 atletas" [alert]="true"></app-summary-card>
+    </div>
+
+    <div class="year-card">
+      <div class="label">ACUMULADO EM 2026</div>
+      <div class="bebas value">R$ 6.480</div>
+      <div class="caixa">Caixa atual do time: <b>R$ 620</b></div>
+    </div>
+
+    <div class="notice">
+      <ion-icon name="notifications-outline"></ion-icon>
+      Vencimento dia 10 · atrasados já notificados
+    </div>
+
+    <div class="row" *ngFor="let r of rows">
+      <app-avatar [label]="r.initials" [size]="34"></app-avatar>
+      <div class="info">
+        <div class="name">{{ r.name }}</div>
+        <div class="meta">R$ 60 · julho</div>
+      </div>
+      <span class="paid" *ngIf="r.status === 'PAID'; else pendingBtn" [style.color]="statusColor(r.status)">
+        <ion-icon name="checkmark-outline"></ion-icon> {{ statusLabel(r.status) }}
+      </span>
+      <ng-template #pendingBtn>
+        <button
+          type="button"
+          class="confirm tap"
+          [style.color]="statusColor(r.status)"
+          [style.background]="statusColor(r.status) + '14'"
+          [style.borderColor]="statusColor(r.status) + '44'"
+          (click)="confirmPayment(r)"
+        >Confirmar</button>
+      </ng-template>
+    </div>
+  </div>
+</ion-content>

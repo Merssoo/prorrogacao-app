@@ -1,0 +1,34 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="SEU PERFIL"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="photo">
+      <div class="add-photo tap">
+        <ion-icon name="add-outline"></ion-icon>
+      </div>
+      <span>Adicionar foto</span>
+    </div>
+
+    <app-field icon="person-outline" placeholder="Apelido no time" [(value)]="nickname"></app-field>
+
+    <app-eyebrow>POSIÇÃO PRINCIPAL</app-eyebrow>
+    <div class="chip-wrap">
+      <app-chip *ngFor="let p of positions" [active]="position === p" (selected)="position = p">{{ p }}</app-chip>
+    </div>
+
+    <app-eyebrow>PÉ DOMINANTE</app-eyebrow>
+    <div class="chip-row">
+      <app-chip *ngFor="let p of feet" [active]="foot === p" [grow]="true" (selected)="foot = p">{{ p }}</app-chip>
+    </div>
+
+    <app-field icon="clipboard-outline" placeholder="Número da camisa" [(value)]="jerseyNumber"></app-field>
+
+    <div class="cta">
+      <app-button icon="checkmark-outline" (pressed)="finish()">CONCLUIR</app-button>
+    </div>
+  </div>
+</ion-content>

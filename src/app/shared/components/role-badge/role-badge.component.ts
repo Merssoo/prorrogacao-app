@@ -1,17 +1,18 @@
 import { Component, Input } from '@angular/core';
 
-export type Papel = 'PRESIDENTE' | 'TESOUREIRO' | 'CONSELHEIRO' | 'JOGADOR';
+export type Role = 'PRESIDENT' | 'TREASURER' | 'COUNCIL_MEMBER' | 'PLAYER';
 
 interface RoleMeta {
   color: string;
   icon: string;
+  label: string;
 }
 
-const ROLE_MAP: Record<Papel, RoleMeta> = {
-  PRESIDENTE: { color: '#F5C542', icon: 'ribbon-outline' },
-  TESOUREIRO: { color: '#5FCB7E', icon: 'cash-outline' },
-  CONSELHEIRO: { color: '#8FB4FF', icon: 'shield-outline' },
-  JOGADOR: { color: '#8A968C', icon: 'person-outline' },
+const ROLE_MAP: Record<Role, RoleMeta> = {
+  PRESIDENT: { color: '#F5C542', icon: 'ribbon-outline', label: 'PRESIDENTE' },
+  TREASURER: { color: '#5FCB7E', icon: 'cash-outline', label: 'TESOUREIRO' },
+  COUNCIL_MEMBER: { color: '#8FB4FF', icon: 'shield-outline', label: 'CONSELHEIRO' },
+  PLAYER: { color: '#8A968C', icon: 'person-outline', label: 'JOGADOR' },
 };
 
 @Component({
@@ -21,7 +22,7 @@ const ROLE_MAP: Record<Papel, RoleMeta> = {
   styleUrls: ['./role-badge.component.scss'],
 })
 export class RoleBadgeComponent {
-  @Input() role: Papel = 'JOGADOR';
+  @Input() role: Role = 'PLAYER';
 
   get meta(): RoleMeta {
     return ROLE_MAP[this.role];

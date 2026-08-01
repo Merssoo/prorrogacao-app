@@ -6,7 +6,7 @@
       </div>
       <div>
         <div class="bebas team-name">UNIÃO DA VILA F.C.</div>
-        <div class="role-row"><app-role-badge role="PRESIDENTE"></app-role-badge></div>
+        <div class="role-row"><app-role-badge role="PRESIDENT"></app-role-badge></div>
       </div>
     </div>
     <div class="bell-wrap">
@@ -22,12 +22,12 @@
   <div class="body pad-none-top">
     <div class="row-header">
       <app-eyebrow>PRÓXIMO JOGO</app-eyebrow>
-      <span class="new-event tap" (click)="irParaCriarEvento()">
+      <span class="new-event tap" (click)="goToCreateEvent()">
         <ion-icon name="add-outline"></ion-icon> Novo evento
       </span>
     </div>
 
-    <div class="match-card tap" (click)="irParaEvento()">
+    <div class="match-card tap" (click)="goToEvent()">
       <div class="glow"></div>
       <div class="match-date">
         <ion-icon name="calendar-outline"></ion-icon>
@@ -43,23 +43,23 @@
       </div>
       <div class="match-cta">
         <app-button
-          [variant]="presencaConfirmada ? 'grass' : 'gold'"
+          [variant]="attendanceConfirmed ? 'grass' : 'gold'"
           icon="checkmark-outline"
-          (pressed)="alternarPresenca($event)"
-        >{{ presencaConfirmada ? 'PRESENÇA CONFIRMADA' : 'CONFIRMAR PRESENÇA' }}</app-button>
+          (pressed)="toggleAttendance($event)"
+        >{{ attendanceConfirmed ? 'PRESENÇA CONFIRMADA' : 'CONFIRMAR PRESENÇA' }}</app-button>
       </div>
     </div>
 
     <div class="avatars-row">
       <div class="stack">
-        <div class="stacked" *ngFor="let a of avatares">
+        <div class="stacked" *ngFor="let a of avatars">
           <app-avatar [label]="a" [size]="30"></app-avatar>
         </div>
         <div class="stacked">
           <app-avatar label="+11" [size]="30" variant="grass"></app-avatar>
         </div>
       </div>
-      <div class="vagas">
+      <div class="spots">
         <span class="bebas count">16</span>
         <span class="total">/20 vagas</span>
       </div>
@@ -67,12 +67,12 @@
 
     <div class="tiles">
       <app-tile icon="people-outline" label="Elenco" sub="18 atletas"></app-tile>
-      <app-tile icon="star-outline" label="Notas" sub="Avaliar time" (pressed)="irParaNotas()"></app-tile>
-      <app-tile icon="checkbox-outline" label="Votação" sub="Craque do jogo" (pressed)="irParaVotacao()"></app-tile>
-      <app-tile icon="shuffle-outline" label="Sortear" sub="Times do racha" (pressed)="irParaSorteio()"></app-tile>
+      <app-tile icon="star-outline" label="Notas" sub="Avaliar time" (pressed)="goToRatings()"></app-tile>
+      <app-tile icon="checkbox-outline" label="Votação" sub="Craque do jogo" (pressed)="goToVoting()"></app-tile>
+      <app-tile icon="shuffle-outline" label="Sortear" sub="Times do racha" (pressed)="goToDraft()"></app-tile>
     </div>
 
-    <div class="finance-banner tap" (click)="irParaFinanceiro()">
+    <div class="finance-banner tap" (click)="goToFinance()">
       <div>
         <div class="label">MENSALIDADE</div>
         <div class="value">4 atletas em atraso · R$ 240</div>

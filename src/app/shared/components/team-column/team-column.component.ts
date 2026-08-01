@@ -1,16 +1,16 @@
 import { Component, Input } from '@angular/core';
 
-export interface SorteioPlayer {
-  nome: string;
+export interface DraftPlayer {
+  name: string;
   pos: string;
-  nota: number;
+  rating: number;
 }
 
-export interface SorteioTeam {
-  nome: string;
-  cor: string;
-  soma: number;
-  players: SorteioPlayer[];
+export interface DraftTeam {
+  name: string;
+  color: string;
+  total: number;
+  players: DraftPlayer[];
 }
 
 @Component({
@@ -20,5 +20,5 @@ export interface SorteioTeam {
   styleUrls: ['./team-column.component.scss'],
 })
 export class TeamColumnComponent {
-  @Input() team!: SorteioTeam;
+  @Input() team!: DraftTeam;
 }

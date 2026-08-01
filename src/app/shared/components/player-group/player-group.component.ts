@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 
 export interface PlayerListItem {
-  nome: string;
+  name: string;
   pos: string;
-  ini: string;
+  initials: string;
 }
 
 @Component({
