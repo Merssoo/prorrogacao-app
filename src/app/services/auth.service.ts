@@ -105,6 +105,22 @@ export class AuthService {
     return this.apiService.post(`${this.authEndpoint}/resend-code`, data);
   }
 
+  forgotPassword(data: { email: string }): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.authEndpoint}/forgot-password`, data);
+  }
+
+  resendForgotPasswordCode(data: { email: string }): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.authEndpoint}/forgot-password/resend-code`, data);
+  }
+
+  verifyForgotPasswordCode(data: { email: string; code: string }): Observable<{ resetToken: string }> {
+    return this.apiService.post(`${this.authEndpoint}/forgot-password/verify-code`, data);
+  }
+
+  resetPassword(data: { resetToken: string; newPassword: string }): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.authEndpoint}/reset-password`, data);
+  }
+
   async getValidAccessToken(): Promise<string | null> {
     const accessToken = await this.storage.getAccessToken();
     if (accessToken && !this.isTokenExpired(accessToken)) {

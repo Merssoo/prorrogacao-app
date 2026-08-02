@@ -29,30 +29,9 @@
   }
 }
 
-.digits {
-  display: flex;
-  gap: 9px;
-  justify-content: center;
+app-code-input {
+  display: block;
   margin-bottom: 24px;
-  flex-wrap: wrap;
-
-  input {
-    width: 46px;
-    height: 56px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    border-radius: 12px;
-    background: var(--p-card);
-    color: var(--p-chalk);
-    border: 1px solid var(--p-line);
-    font-family: inherit;
-    outline: none;
-
-    &.filled {
-      border-color: var(--p-gold);
-    }
-  }
 }
 
 .resend {

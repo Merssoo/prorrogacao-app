@@ -3,14 +3,12 @@ import { Router } from '@angular/router';
 import { IonModal, ToastController } from '@ionic/angular';
 import { AuthService } from '../../services/auth.service';
 import { getErrorMessage } from '../../shared/http-error.util';
+import { EMAIL_PATTERN, MIN_PASSWORD_LENGTH } from '../../shared/validation.util';
 
 interface IonScrollEvent {
   detail: { scrollTop: number };
   target: HTMLIonContentElement;
 }
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
 
 @Component({
   standalone: false,

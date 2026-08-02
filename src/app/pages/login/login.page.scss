@@ -37,8 +37,12 @@
 .forgot {
   text-align: right;
   margin-bottom: 18px;
-  color: var(--p-muted);
   font-size: 12.5px;
+
+  span {
+    color: var(--p-gold);
+    font-weight: 600;
+  }
 }
 
 .switch {

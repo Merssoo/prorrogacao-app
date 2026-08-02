@@ -21,6 +21,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/verify-email/verify-email.module').then( m => m.VerifyEmailPageModule)
   },
   {
+    path: 'forgot-password',
+    loadChildren: () => import('./pages/forgot-password/forgot-password.module').then( m => m.ForgotPasswordPageModule)
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)

@@ -20,6 +20,7 @@ import { TeamColumnComponent } from './components/team-column/team-column.compon
 import { SummaryCardComponent } from './components/summary-card/summary-card.component';
 import { VoteQuestionComponent } from './components/vote-question/vote-question.component';
 import { TypeCardComponent } from './components/type-card/type-card.component';
+import { CodeInputComponent } from './components/code-input/code-input.component';
 
 const COMPONENTS = [
   TopBarComponent,
@@ -39,6 +40,7 @@ const COMPONENTS = [
   SummaryCardComponent,
   VoteQuestionComponent,
   TypeCardComponent,
+  CodeInputComponent,
 ];
 
 @NgModule({

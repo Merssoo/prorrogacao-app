@@ -16,22 +16,7 @@
       </div>
     </div>
 
-    <div class="digits">
-      <input
-        *ngFor="let d of digits; let i = index; trackBy: trackByIndex"
-        #digitInput
-        [value]="d"
-        (input)="onDigitInput(i, $event)"
-        (keydown)="onDigitKeydown(i, $event)"
-        (paste)="onDigitsPaste($event)"
-        type="text"
-        inputmode="numeric"
-        autocomplete="one-time-code"
-        pattern="[0-9]*"
-        maxlength="1"
-        [class.filled]="d"
-      />
-    </div>
+    <app-code-input [(value)]="code" [disabled]="loading" (completed)="confirm()"></app-code-input>
 
     <app-button icon="checkmark-outline" [loading]="loading" (pressed)="confirm()">CONFIRMAR</app-button>
 

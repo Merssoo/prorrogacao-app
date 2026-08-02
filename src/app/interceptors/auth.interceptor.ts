@@ -10,6 +10,8 @@ const PUBLIC_AUTH_PATHS = [
   '/auth/login',
   '/auth/resend-code',
   '/auth/refresh-token',
+  '/auth/forgot-password',
+  '/auth/reset-password',
 ];
 
 const NETWORK_ERROR_MESSAGE =

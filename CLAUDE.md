@@ -140,12 +140,17 @@ cobrir os dois sem duas implementações divergentes de auth.
   Só há logout forçado quando o próprio refresh token é rejeitado pela API (expirado/revogado) — ver
   divergências do BeSeen acima.
 
-## Estado atual: front de auth implementado (2026-07-24), renomeado pra inglês (2026-08-01), backend ainda não existe
+## Estado atual: front + módulo auth do backend implementados (2026-08-02)
 
 O front (`prorrogacao-app`) já tem toda a fiação de auth abaixo pronta e buildando (`ng build`
-passou limpo). O `prorrogacao-api` continua só o esqueleto do Spring Initializr (nenhuma entidade,
-nenhum endpoint) — ou seja, o front chama endpoints que **ainda não existem no backend**. Antes de
-assumir que algo mudou, checar se esses arquivos ainda existem e bater com a descrição:
+passou limpo). **O `prorrogacao-api` deixou de ser só o esqueleto do Initializr** — o módulo `auth`
+já existe e responde de verdade: `register`/`verify-email`/`resend-code`/`login`/`refresh-token`,
+com JWT (`JwtService`, claims `sub`/`name`/`email`), lockout de conta (5 tentativas → 15min),
+mitigação de user enumeration (hash dummy) e rate limiting por IP (`AuthRateLimitFilter`) — o
+padrão de referência do BeSeen (seção acima) foi implementado, adaptado pras decisões já tomadas
+(multi-device etc.). Antes de assumir que algo mudou, checar se esses arquivos ainda existem e
+bater com a descrição — tanto os do front quanto os do back
+(`prorrogacao-api/src/main/java/com/prorrogacao_api/{controller,service,security,exception}`):
 
 - `src/app/services/secure-storage.service.ts` — abstração de storage (ver seção acima).
 - `src/app/services/api.service.ts` — wrapper fino de `HttpClient` com `environment.apiUrl`.
@@ -167,12 +172,10 @@ assumir que algo mudou, checar se esses arquivos ainda existem e bater com a des
   (era `evento`), `draft` (era `sorteio`), `ratings` (era `notas`), `voting` (era `votacao`),
   `finance` (era `financeiro`) — ainda são só mock/UI, sem chamada de API real.
 
-### Contrato de API assumido pelo front (rascunho — implementar no `prorrogacao-api` a seguir)
+### Contrato de API (implementado no `prorrogacao-api`, módulo `auth` — 2026-08-02)
 
-Esses formatos foram inventados pelo front na ausência de um backend — **não são spec fechada**,
-só o que precisa bater quando o módulo `auth` do Spring Boot for implementado. Ajustar aqui se o
-contrato mudar durante a implementação do backend. Nomes de campo em inglês (ver "Convenção de
-nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra ficam em português.
+Nomes de campo em inglês (ver "Convenção de nomenclatura" no topo do arquivo) — só os
+valores/mensagens que a UI mostra ficam em português.
 
 | Endpoint | Body | Resposta 2xx |
 |---|---|---|
@@ -182,8 +185,22 @@ nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra f
 | `POST /auth/login` | `{ email, password }` | `{ accessToken, refreshToken, profileCreated }` |
 | `POST /auth/refresh-token` | `{ refreshToken }` | `{ accessToken, refreshToken }` |
 
-- Erros: front lê `error.error.message` (corpo JSON com campo `message`) pra mostrar no toast; sem
-  esse campo cai num texto genérico fixo por tela.
+- **Erros**: `GlobalExceptionHandler` (`prorrogacao-api`) sempre responde
+  `{ timestamp, status, error, code, message, path }`. O front lê `error.error.message` pro toast
+  (`getErrorMessage`, `http-error.util.ts`) e `error.error.code` (`getErrorCode`) quando precisa
+  ramificar por tipo de erro em vez de por texto — texto de mensagem pode mudar (i18n, copy), `code`
+  é estável (`VALIDATION_ERROR`, `DUPLICATE_EMAIL`, `USER_NOT_FOUND`, `INVALID_VERIFICATION_CODE`,
+  `EMAIL_ALREADY_VERIFIED`, `INVALID_CREDENTIALS`, `EMAIL_NOT_VERIFIED`, `TOKEN_REFRESH_FAILED`,
+  `INTERNAL_ERROR`).
+- **Login com e-mail não confirmado redireciona pra verificação** (`login.page.ts`, sessão
+  2026-08-02): `EmailNotVerifiedException` responde **403** com `code: "EMAIL_NOT_VERIFIED"` —
+  deliberadamente separado de `InvalidCredentialsException` (401, senha errada), que antes caíam no
+  mesmo handler/status e só se diferenciavam pelo texto da mensagem. O front checa **status 403 E
+  code `EMAIL_NOT_VERIFIED` juntos** (`isEmailNotVerified()`) antes de redirecionar pra
+  `/verify-email` — checar só o status seria arriscado (um 403 futuro por outro motivo não deveria
+  mandar o usuário pra lá). Isso existe pra não deixar o usuário travado se ele fechar o app na tela
+  de código depois do cadastro: tentar logar de novo mais tarde o manda de volta pra
+  `/verify-email` (com o e-mail já preenchido via `state`) em vez de só mostrar um erro genérico.
 - `profileCreated` no login decide se o front manda o usuário pra `/profile` (criar perfil de
   atleta) ou `/home`.
 - Claims do access token (JWT) que o front decodifica: `sub` (id do usuário), `name`, `email`,
@@ -195,23 +212,20 @@ nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra f
   "LI E ACEITO OS TERMOS" no modal de termos (`(pressed)="acceptTerms(termsModal)"`) só habilita
   depois que o usuário rola o texto até o fim (`hasReadTermsToBottom`, via `onTermsScroll`); sem
   isso, `submit()` bloqueia o cadastro no próprio front com toast, sem nem chamar a API. Padrão
-  adaptado do `beseen-app` (`signup.page.ts`/`.html`), que faz o mesmo scroll-gate. **Diferença
-  deliberada do BeSeen**: lá o back tem `@AssertTrue` no DTO de registro (`UserRegistration`) que
-  rejeita `acceptedTerms: false` com 400 — o `prorrogacao-api` deve replicar essa validação
-  server-side (não confiar só no front) quando o módulo `auth` for implementado, persistindo como
-  `boolean acceptedTerms` numa coluna simples na entidade de usuário (sem entidade/versão de termos
-  separada — BeSeen também não tem isso). O texto dos termos exibido no modal é **provisório**
-  (placeholder adaptado ao domínio do Prorrogação) e precisa ser revisado/substituído antes do
-  lançamento — não existe endpoint pra buscar o texto/versão dos termos, é estático no template
-  (`register.page.html`), igual ao padrão do BeSeen.
-- **Validação client-side no cadastro** (`register.page.ts`, sessão 2026-08-01): e-mail por regex
-  (`EMAIL_PATTERN`), senha com **mínimo 8 caracteres** (`MIN_PASSWORD_LENGTH`), confirmação de senha
-  igual à senha, nome não vazio, e `acceptedTerms` true — todos via getters (`isFormValid`) sem
-  Reactive Forms (o app usa binding simples `[(value)]` no `app-field`, não `FormGroup`). O botão
-  "CONTINUAR" fica `[disabled]` até `isFormValid`. **Isso é só UX, não substitui validação
-  server-side** — o `prorrogacao-api` precisa validar de novo (mínimo de senha, formato de e-mail
-  etc.) quando o endpoint `/auth/register` for implementado, mesma lógica do item acima sobre
-  `acceptedTerms`.
+  adaptado do `beseen-app` (`signup.page.ts`/`.html`), que faz o mesmo scroll-gate. O
+  `prorrogacao-api` replica a validação server-side: `RegisterRequest.acceptedTerms` tem
+  `@AssertTrue`, rejeitando `false` com 400 (`VALIDATION_ERROR`) — `User.acceptedTerms` é uma coluna
+  boolean simples (sem entidade/versão de termos separada, igual ao BeSeen). O texto dos termos
+  exibido no modal é **provisório** (placeholder adaptado ao domínio do Prorrogação) e precisa ser
+  revisado/substituído antes do lançamento — não existe endpoint pra buscar o texto/versão dos
+  termos, é estático no template (`register.page.html`), igual ao padrão do BeSeen.
+- **Validação client-side no cadastro** (`register.page.ts`): e-mail por regex (`EMAIL_PATTERN`),
+  senha com **mínimo 8 caracteres** (`MIN_PASSWORD_LENGTH`), confirmação de senha igual à senha,
+  nome não vazio, e `acceptedTerms` true — todos via getters (`isFormValid`) sem Reactive Forms (o
+  app usa binding simples `[(value)]` no `app-field`, não `FormGroup`). O botão "CONTINUAR" fica
+  `[disabled]` até `isFormValid`. É só UX — o `prorrogacao-api` valida de novo server-side
+  (`RegisterRequest`: `@NotBlank`/`@Email`/`@Size(min = 8)`/`@AssertTrue`), mesmo mínimo de 8
+  caracteres dos dois lados.
 - **Erro de rede/API fora do ar tratado no `authInterceptor`** (sessão 2026-08-01): antes, requests
   pros paths públicos de auth (`/auth/register`, `/auth/login`, etc.) passavam batido pelo
   interceptor sem nenhum `catchError` — quando a API está fora do ar, o Angular retorna
@@ -226,7 +240,6 @@ nomenclatura" no topo do arquivo) — só os valores/mensagens que a UI mostra f
 
 ### Próximo passo combinado
 
-Implementar o módulo `auth` no `prorrogacao-api` (Spring Boot) pra esses endpoints passarem a
-responder de verdade — usar o padrão do BeSeen como referência (seção acima), com as adaptações já
-decididas (multi-device, lockout + rate limit na v1) e a estrutura de camadas da seção 6 do doc
-técnico (`config`, `auth`, `usuario`, ...).
+Módulo `auth` do `prorrogacao-api` implementado (2026-08-02) — próximo é o módulo `usuario`/perfil
+(a tela `/profile` já existe no front, ainda mockada) e depois `time`/filiação, seguindo a estrutura
+de camadas da seção 6 do doc técnico (`config`, `auth`, `usuario`, `time`, ...).

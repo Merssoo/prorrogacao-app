@@ -85,9 +85,17 @@ ion-content {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 0 calc(22px + env(safe-area-inset-right)) 24px calc(22px + env(safe-area-inset-left));
+  // Respiro entre o header (app-top-bar/home-header) e o primeiro elemento do
+  // conteúdo — sem isso, o padding-bottom do header é a única separação.
+  padding-top: 18px;
+  padding-right: calc(22px + env(safe-area-inset-right));
+  padding-bottom: 24px;
+  padding-left: calc(22px + env(safe-area-inset-left));
 }
 .body.pad-lg {
+  // login usa esse variant e não tem <ion-header> — o respiro do topo já vem
+  // do próprio `.brand` (margin-top com safe-area embutido).
+  padding-top: 0;
   padding-left: calc(26px + env(safe-area-inset-left));
   padding-right: calc(26px + env(safe-area-inset-right));
 }
