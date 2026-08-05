@@ -1,34 +1,78 @@
 <ion-header>
   <div class="header-wrap">
-    <app-top-bar title="SEU PERFIL"></app-top-bar>
+    <app-top-bar [title]="pageTitle" [showBack]="true" (back)="goBack()"></app-top-bar>
   </div>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="screen-content">
   <div class="body">
-    <div class="photo">
-      <div class="add-photo tap">
-        <ion-icon name="add-outline"></ion-icon>
-      </div>
-      <span>Adicionar foto</span>
-    </div>
+    <app-player-card
+      [photoUrl]="photoPreviewUrl"
+      [photoUploading]="photoUploading"
+      [nickname]="nickname"
+      [position]="position"
+      [dominantFoot]="dominantFoot"
+      [jerseyNumber]="jerseyNumber"
+      [attackRating]="attackRating"
+      [defenseRating]="defenseRating"
+      [physicalRating]="physicalRating"
+      [skillRating]="skillRating"
+      (photoTap)="pickPhoto()"
+    ></app-player-card>
 
-    <app-field icon="person-outline" placeholder="Apelido no time" [(value)]="nickname"></app-field>
+    <app-field
+      icon="person-outline"
+      placeholder="Apelido no time"
+      [(value)]="nickname"
+      [error]="nicknameError"
+      (blurred)="nicknameTouched = true"
+    ></app-field>
 
     <app-eyebrow>POSIÇÃO PRINCIPAL</app-eyebrow>
     <div class="chip-wrap">
-      <app-chip *ngFor="let p of positions" [active]="position === p" (selected)="position = p">{{ p }}</app-chip>
+      <app-chip *ngFor="let p of positions" [active]="position === p" (selected)="selectPosition(p)">{{ p }}</app-chip>
+    </div>
+
+    <app-eyebrow>POSIÇÃO SECUNDÁRIA (OPCIONAL)</app-eyebrow>
+    <div class="chip-wrap">
+      <app-chip
+        *ngFor="let p of secondaryPositionOptions"
+        [active]="secondaryPosition === p"
+        (selected)="selectSecondaryPosition(p)"
+      >{{ p }}</app-chip>
     </div>
 
     <app-eyebrow>PÉ DOMINANTE</app-eyebrow>
     <div class="chip-row">
-      <app-chip *ngFor="let p of feet" [active]="foot === p" [grow]="true" (selected)="foot = p">{{ p }}</app-chip>
+      <app-chip *ngFor="let p of feet" [active]="dominantFoot === p" [grow]="true" (selected)="dominantFoot = p">{{ p }}</app-chip>
     </div>
 
-    <app-field icon="clipboard-outline" placeholder="Número da camisa" [(value)]="jerseyNumber"></app-field>
+    <app-eyebrow>NÚMERO PREFERIDO (OPCIONAL)</app-eyebrow>
+    <app-jersey-number-picker [(value)]="jerseyNumber"></app-jersey-number-picker>
+
+    <app-field
+      icon="calendar-outline"
+      placeholder="Data de nascimento (dd/mm/aaaa)"
+      [value]="birthDate"
+      (valueChange)="onBirthDateInput($event)"
+      [maxlength]="10"
+      [iconClickable]="true"
+      (iconClick)="openBirthDatePicker($event)"
+    ></app-field>
 
     <div class="cta">
-      <app-button icon="checkmark-outline" (pressed)="finish()">CONCLUIR</app-button>
+      <app-button icon="checkmark-outline" [disabled]="!isFormValid" [loading]="loading" (pressed)="submit()">{{ submitLabel }}</app-button>
     </div>
   </div>
 </ion-content>
+
+<ion-popover #birthDatePopover>
+  <ng-template>
+    <ion-datetime
+      presentation="date"
+      [max]="today"
+      [value]="birthDateIso"
+      (ionChange)="onDateSelected($event)"
+    ></ion-datetime>
+  </ng-template>
+</ion-popover>

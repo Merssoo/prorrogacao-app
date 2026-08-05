@@ -12,8 +12,11 @@ export class FieldComponent {
   @Input() type: 'text' | 'email' | 'password' | 'number' = 'text';
   @Input() value = '';
   @Input() error: string | null = null;
+  @Input() iconClickable = false;
+  @Input() maxlength?: number;
   @Output() valueChange = new EventEmitter<string>();
   @Output() blurred = new EventEmitter<void>();
+  @Output() iconClick = new EventEmitter<MouseEvent>();
 
   showPassword = false;
 

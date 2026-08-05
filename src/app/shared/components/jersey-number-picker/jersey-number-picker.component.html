@@ -1,0 +1,35 @@
+<div class="jersey-picker">
+  <button type="button" class="step-btn tap" [disabled]="!canDecrement" (click)="decrement()">
+    <ion-icon name="remove-outline"></ion-icon>
+  </button>
+
+  <div class="jersey tap" (click)="!editing && startEditing()">
+    <svg viewBox="0 0 120 120" class="jersey-svg" preserveAspectRatio="none">
+      <path
+        d="M40 5 L25 5 L5 25 L20 45 L35 35 L35 115 L85 115 L85 35 L100 45 L115 25 L95 5 L80 5
+           C 80 15 71 22 60 22 C 49 22 40 15 40 5 Z"
+      />
+    </svg>
+    <div class="jersey-number-wrap">
+      <span class="jersey-number bebas" *ngIf="!editing">{{ value ?? '--' }}</span>
+      <input
+        *ngIf="editing"
+        #numberInput
+        class="jersey-number-input bebas"
+        type="text"
+        inputmode="numeric"
+        maxlength="2"
+        [value]="draftValue"
+        (input)="onDraftInput($event)"
+        (blur)="commitEditing()"
+        (keydown.enter)="confirmEditing()"
+        (keydown.escape)="cancelEditing()"
+        (click)="$event.stopPropagation()"
+      />
+    </div>
+  </div>
+
+  <button type="button" class="step-btn tap" [disabled]="!canIncrement" (click)="increment()">
+    <ion-icon name="add-outline"></ion-icon>
+  </button>
+</div>

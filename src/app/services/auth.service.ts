@@ -144,6 +144,13 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
+    const refreshToken = await this.storage.getRefreshToken();
+    if (refreshToken) {
+      try {
+        await firstValueFrom(this.apiService.post(`${this.authEndpoint}/logout`, { refreshToken }));
+      } catch {
+      }
+    }
     await this.storage.clear();
     this.authStateSubject.next(false);
     this.currentUserSubject.next(null);

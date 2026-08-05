@@ -21,6 +21,8 @@ import { SummaryCardComponent } from './components/summary-card/summary-card.com
 import { VoteQuestionComponent } from './components/vote-question/vote-question.component';
 import { TypeCardComponent } from './components/type-card/type-card.component';
 import { CodeInputComponent } from './components/code-input/code-input.component';
+import { PlayerCardComponent } from './components/player-card/player-card.component';
+import { JerseyNumberPickerComponent } from './components/jersey-number-picker/jersey-number-picker.component';
 
 const COMPONENTS = [
   TopBarComponent,
@@ -41,6 +43,8 @@ const COMPONENTS = [
   VoteQuestionComponent,
   TypeCardComponent,
   CodeInputComponent,
+  PlayerCardComponent,
+  JerseyNumberPickerComponent,
 ];
 
 @NgModule({

@@ -238,8 +238,104 @@ valores/mensagens que a UI mostra ficam em português.
   novamente em instantes." — como `getErrorMessage` (`http-error.util.ts`) já lê esse campo, todas
   as páginas mostram a mensagem certa automaticamente, sem precisar de lógica própria por tela.
 
+### `POST /auth/logout` (implementado, não é rascunho)
+
+Apaga o refresh token daquele device específico (`refreshTokenRepository.deleteByToken`) — não
+todos os do usuário, combina com a decisão de multi-device. Endpoint público (identidade vem do
+próprio `refreshToken` no body, igual `/auth/refresh-token`), idempotente (token já ausente não é
+erro). `AuthService.logout()` do front (`auth.service.ts`) chama esse endpoint **best-effort**
+antes de limpar o storage local — se a chamada falhar (rede, token já inválido), o logout local
+segue de qualquer forma, não pode travar o usuário na tela.
+
+### Tela de perfil: criação/edição reaproveitada, card estilo FIFA (sessão 2026-08-02)
+
+`profile.page.ts` deixou de ser mock — decisões tomadas nessa sessão, registradas aqui porque
+divergem ou completam o que o doc técnico define:
+
+- **Uma tela só pra criar E editar o perfil.** O modo é inferido pelo próprio estado, não por uma
+  flag de rota: `ionViewWillEnter` chama `ProfileService.getMyProfile()` — se vier um perfil,
+  `isEditMode = true`; se vier `null` (404, inclusive porque o endpoint nem existe ainda no
+  backend), assume criação. Evita o risco de a tela "achar" que está num modo errado por causa de
+  um parâmetro de URL dessincronizado.
+- **`ionViewWillEnter`, não `ngOnInit` — de propósito, por causa do `IonicRouteStrategy`**
+  (`app.module.ts`): ele cacheia páginas em vez de destruí-las ao navegar pra fora, então
+  `ngOnInit` só roda uma vez na vida da instância. Bug real encontrado nessa sessão: sair do
+  perfil (modo criação → `<` desloga, ver abaixo) e logar com **outra conta que também não tem
+  perfil** reaproveitava a MESMA instância de `ProfilePage`, com os campos ainda preenchidos da
+  conta anterior — vazamento de dado entre sessões. Corrigido com `ionViewWillEnter` (dispara toda
+  vez que a página fica ativa, cache ou não, inclusive na primeira entrada) chamando
+  `resetFormState()` antes de buscar o perfil de novo. **Vale pra qualquer página futura que
+  guarde estado sensível em propriedades de instância** — `ngOnInit` sozinho não é suficiente
+  nesse app pra "resetar ao reentrar", precisa de `ionViewWillEnter`.
+- **Regra do botão `<` (`goBack()`)**: em modo criação, volta = **logout de verdade** (
+  `authService.logout()`, que já apaga o refresh token na API — ver seção acima) e manda pra
+  `/login`, porque essa tela é etapa obrigatória pós-cadastro, não tem "cancelar e voltar pra
+  algum lugar" sem perfil. Em modo edição, volta só navega pra `/home` — **não desloga**. Hoje só
+  existe UM ponto de entrada pra essa tela (o redirect do `login.page.ts` quando `!profileCreated`),
+  então na prática ela sempre abre em modo criação por enquanto — o modo edição só passa a ser
+  alcançável quando existir uma entrada tipo "meu perfil" em algum outro lugar do app.
+- **`numero_camisa` do ER (seção 4 do doc técnico) é campo de `FILIACAO` (por time), não de
+  `PERFIL`.** Como essa tela roda antes do usuário estar em qualquer time, decidimos **não** pedir
+  o número de camisa "de verdade" aqui — o campo (`preferredJerseyNumber` no front) é uma
+  conveniência do perfil global (o `app-jersey-number-picker` interativo), usada só como sugestão
+  de número quando o usuário entrar num time depois (a unicidade real por time continua sendo
+  responsabilidade da `FILIACAO`, ainda não implementada).
+- **Foto de perfil — fluxo de URL pré-assinada (S3), contrato assumido pelo front** (igual o padrão
+  já usado pra auth: front inventa, backend implementa depois):
+
+  | Endpoint | Body | Resposta 2xx |
+  |---|---|---|
+  | `POST /profile/photo-upload-url` | `{ fileName, fileSize, contentType }` | `{ uploadUrl, photoUrl }` |
+  | `PUT {uploadUrl}` (S3, fora da nossa API) | bytes crus da imagem | — |
+  | `GET /profile` | — | `Profile` ou 404 |
+  | `PUT /profile` | `Profile` (inclui `photoUrl` já confirmado) | `Profile` |
+
+  `ProfileService.uploadPhotoToStorage()` usa um `HttpClient` construído a partir de `HttpBackend`
+  (mesmo truque do `AuthService` pro refresh) — **não pode** passar pelo `authInterceptor`, porque
+  a URL pré-assinada não é da nossa API (não tem `environment.apiUrl` como prefixo, autentica pela
+  assinatura na própria URL, não pelo nosso Bearer token). Fluxo no front
+  (`profile.page.ts#pickPhoto/uploadPhoto`): `@capacitor/camera` (`Camera.getPhoto`, funciona em
+  web via `getUserMedia`/file picker, não só nativo) → preview local imediato (`photo.webPath`,
+  funciona direto num `<img>`) → pede a URL assinada → `PUT` pro S3 → só then troca o preview local
+  pela URL final e habilita ela no payload de salvar perfil. **Infra de S3 real (bucket,
+  credenciais AWS, o endpoint em si) ainda não existe no `prorrogacao-api`** — combinado que fica
+  pra depois; por ora a chamada falha (toast de erro) — desde a sessão 2026-08-02 (ajuste posterior),
+  o preview local some do card nesse caso (`photoPreviewUrl = null` no `catch` de
+  `uploadPhoto()`), tanto pra erro pedindo a URL assinada quanto pra erro no `PUT` do S3 — antes a
+  foto escolhida continuava aparecendo no card mesmo sem ter sido confirmada, o que dava a entender
+  (errado) que o envio tinha funcionado.
+- **Componentes novos no `shared`**: `app-player-card` — reescrito na sessão 2026-08-02 no visual
+  "escudo/brasão" (topo reto, ponta pra baixo, `clip-path: polygon(...)` puro, sem SVG) da
+  referência `docs/card-salah-v2.html`: número da camisa + posição no topo da coluna esquerda,
+  bandeira do Brasil (estática, decorativa — o app não tem campo de nacionalidade) logo abaixo, e
+  marca d'água vertical "prorrogação" (`writing-mode: vertical-rl`) no rodapé da coluna, empurrada
+  pra baixo via `margin-top: auto`. Clicar em qualquer parte do card (inclusive na foto, o clique
+  builda até o wrapper) dispara um efeito de toque (`tapped`, componente controla via
+  `setTimeout`/`TAP_EFFECT_DURATION_MS`) que replica o `:hover` da referência — lift/scale do card
+  + brilho diagonal varrendo (`.card-shine`, `transition: left`) — via classe, já que `:hover` não
+  faz sentido em touch.
+  **Decisão revertida nessa mesma sessão**: o card agora mostra sim ATA/DEF/FOR/HAB (getters
+  `attackRating`/`defenseRating`/`physicalRating`/`skillRating` em `profile.page.ts`, também
+  adicionados ao `Profile` em `profile.service.ts`) — a ressalva antiga era não deixar o próprio
+  atleta se autoavaliar, mas o combinado agora é: todo perfil começa com base 60 em cada atributo, a
+  posição **principal e a secundária** somam um boost próprio por atributo (tabela
+  `POSITION_RATING_BOOSTS`, ex.: zagueiro puxa defesa forte + um pouco de força; lateral puxa um
+  pouco de habilidade; atacante puxa ataque forte) — é só o valor inicial, pensado como ponto de
+  partida pra um sistema futuro de votação de habilidade entre os próprios atletas (ainda não
+  implementado), não uma autoavaliação livre. O pill de pé dominante no card mostra só o valor cru
+  (`Direito`/`Esquerdo`/`Ambidestro`), sem prefixo "Pé" — combinado nessa sessão porque "Pé
+  Ambidestro" não faz sentido gramatical.
+  `app-jersey-number-picker` (camisa em SVG com +/- pra escolher o número, `[(value)]` bindable)
+  não mudou.
+- **Campo de data de nascimento** é só um `app-field` de texto livre com ícone de calendário
+  (mesma convenção "leve" já usada nas telas mock pra data, ex. `criar-evento`), não um date
+  picker de verdade — decisão de escopo pra não introduzir mais um padrão de interação nessa
+  rodada, pode virar um `ion-datetime` num modal depois se quiser algo mais robusto.
+
 ### Próximo passo combinado
 
-Módulo `auth` do `prorrogacao-api` implementado (2026-08-02) — próximo é o módulo `usuario`/perfil
-(a tela `/profile` já existe no front, ainda mockada) e depois `time`/filiação, seguindo a estrutura
-de camadas da seção 6 do doc técnico (`config`, `auth`, `usuario`, `time`, ...).
+Módulo `auth` do `prorrogacao-api` implementado (2026-08-02), incluindo `/auth/logout`. Backend
+ainda precisa: módulo `usuario`/perfil (`GET/PUT /profile`) e a infra de upload de foto (S3 +
+`POST /profile/photo-upload-url`) pra tela de perfil funcionar de ponta a ponta — contrato assumido
+documentado acima. Depois: `time`/filiação (que é onde `numero_camisa` de verdade mora), seguindo a
+estrutura de camadas da seção 6 do doc técnico (`config`, `auth`, `usuario`, `time`, ...).

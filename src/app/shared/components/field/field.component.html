@@ -1,8 +1,15 @@
 <div class="field" [class.has-error]="error">
-  <ion-icon *ngIf="icon" [name]="icon"></ion-icon>
+  <ion-icon
+    *ngIf="icon"
+    [name]="icon"
+    [class.leading-icon-clickable]="iconClickable"
+    [class.tap]="iconClickable"
+    (click)="iconClickable && iconClick.emit($event)"
+  ></ion-icon>
   <input
     [type]="inputType"
     [placeholder]="placeholder"
+    [attr.maxlength]="maxlength ?? null"
     [ngModel]="value"
     (ngModelChange)="valueChange.emit($event)"
     (blur)="blurred.emit()"

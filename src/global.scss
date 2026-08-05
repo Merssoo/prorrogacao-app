@@ -79,22 +79,16 @@ ion-content {
   --padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Wrapper comum para o conteúdo de cada tela — centraliza e limita a
-   largura em telas grandes, mantendo a proporção de um app mobile. */
 .body {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  // Respiro entre o header (app-top-bar/home-header) e o primeiro elemento do
-  // conteúdo — sem isso, o padding-bottom do header é a única separação.
   padding-top: 18px;
   padding-right: calc(22px + env(safe-area-inset-right));
   padding-bottom: 24px;
   padding-left: calc(22px + env(safe-area-inset-left));
 }
 .body.pad-lg {
-  // login usa esse variant e não tem <ion-header> — o respiro do topo já vem
-  // do próprio `.brand` (margin-top com safe-area embutido).
   padding-top: 0;
   padding-left: calc(26px + env(safe-area-inset-left));
   padding-right: calc(26px + env(safe-area-inset-right));
@@ -103,8 +97,6 @@ ion-content {
   padding-top: 0;
 }
 
-/* Cabeçalho/rodapé customizados substituem o toolbar nativo do Ionic —
-   removemos sombras/bordas padrão para bater com o visual do protótipo. */
 ion-header, ion-footer {
   box-shadow: none;
 
@@ -113,10 +105,6 @@ ion-header, ion-footer {
   }
 }
 
-/* Como o header não usa <ion-toolbar>, ele não ganha o respiro de área
-   segura automaticamente — sem isso o conteúdo fica atrás do notch/status
-   bar (iOS) ou da status bar do Android. O footer já resolve isso sozinho
-   via padding-bottom no app-bottom-nav (o fundo escuro cobre a área seg). */
 ion-header {
   margin-top: env(safe-area-inset-top);
 }
@@ -125,5 +113,9 @@ ion-header .header-wrap,
 ion-footer .footer-wrap {
   max-width: 480px;
   margin: 0 auto;
+}
+
+.photo-source-sheet {
+  --button-color: var(--p-gold);
 }
 
