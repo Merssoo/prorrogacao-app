@@ -1,0 +1,78 @@
+<ion-header>
+  <div class="header-wrap hub-header">
+    <div class="icon-btn">
+      <ion-icon name="menu-outline"></ion-icon>
+    </div>
+    <div class="bell-wrap">
+      <div class="icon-btn">
+        <ion-icon name="notifications-outline"></ion-icon>
+      </div>
+      <span class="dot"></span>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body pad-none-top">
+    <div class="greeting">
+      <app-eyebrow>Olá{{ nickname ? ', ' + nickname : '' }}</app-eyebrow>
+      <div class="bebas page-title">SEUS TIMES</div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="teams-list" *ngIf="hasTeams">
+        <div
+          class="team-row tap"
+          *ngFor="let membership of memberships"
+          [class.pending]="membership.status === 'PENDING'"
+          (click)="openTeam(membership)"
+        >
+          <app-crest-badge
+            [crestUrl]="membership.crestUrl"
+            [crestShape]="membership.crestShape"
+            [size]="42"
+            [fallbackLabel]="crestOf(membership)"
+            [avatarVariant]="membership.status === 'ACTIVE' ? 'gold' : 'default'"
+          ></app-crest-badge>
+          <div class="info">
+            <div class="name">{{ membership.teamName }}</div>
+            <app-role-badge
+              *ngIf="membership.status === 'ACTIVE' && membership.role"
+              [role]="membership.role"
+            ></app-role-badge>
+            <span class="pending-pill" *ngIf="membership.status === 'PENDING'">
+              <ion-icon name="time-outline"></ion-icon>PENDENTE
+            </span>
+          </div>
+          <ion-icon *ngIf="membership.status === 'ACTIVE'" class="chevron" name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!hasTeams">
+        <ion-icon name="shield-outline"></ion-icon>
+        <div class="empty-title">Você ainda não tem um time</div>
+        <div class="empty-sub">Crie o seu próprio time ou peça pra entrar em um já existente.</div>
+      </div>
+
+      <app-eyebrow>NOVO TIME</app-eyebrow>
+      <div class="actions">
+        <app-type-card
+          icon="add-circle-outline"
+          title="Criar time"
+          sub="Monte seu elenco e vire o presidente"
+          (pressed)="createTeam()"
+        ></app-type-card>
+        <app-type-card
+          icon="enter-outline"
+          title="Entrar em um time"
+          sub="Solicite entrada com um convite"
+          (pressed)="joinTeam()"
+        ></app-type-card>
+      </div>
+    </ng-container>
+  </div>
+</ion-content>

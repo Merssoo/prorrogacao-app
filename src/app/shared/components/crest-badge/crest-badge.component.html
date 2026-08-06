@@ -1,0 +1,11 @@
+<div class="crest-badge" [style.width.px]="size" [style.height.px]="size">
+  <ng-container *ngIf="crestUrl; else avatarFallback">
+    <div class="crest-badge-border" [ngClass]="shapeClass"></div>
+    <div class="crest-badge-photo" [ngClass]="shapeClass">
+      <img [src]="crestUrl" alt="" />
+    </div>
+  </ng-container>
+  <ng-template #avatarFallback>
+    <app-avatar [label]="fallbackLabel" [size]="size" [variant]="avatarVariant"></app-avatar>
+  </ng-template>
+</div>

@@ -157,7 +157,7 @@ bater com a descrição — tanto os do front quanto os do back
 - `src/app/services/auth.service.ts` — login/register/verifyEmail/resendCode/refresh/logout.
 - `src/app/interceptors/auth.interceptor.ts` — anexa Bearer token, refresh proativo/reativo.
 - `src/app/guards/auth.guard.ts` — só autenticação, aplicado em `app-routing.module.ts` nas rotas
-  `profile`, `home`, `create-event`, `event`, `draft`, `ratings`, `voting`, `finance`.
+  `profile`, `hub`, `home`, `create-event`, `event`, `draft`, `ratings`, `voting`, `finance`.
 - `src/app/shared/http-error.util.ts` — extrai `error.error.message` da resposta HTTP com fallback
   (`getErrorMessage`).
 - `app.module.ts` — `provideHttpClient(withInterceptors([authInterceptor]))` +
@@ -202,7 +202,9 @@ valores/mensagens que a UI mostra ficam em português.
   de código depois do cadastro: tentar logar de novo mais tarde o manda de volta pra
   `/verify-email` (com o e-mail já preenchido via `state`) em vez de só mostrar um erro genérico.
 - `profileCreated` no login decide se o front manda o usuário pra `/profile` (criar perfil de
-  atleta) ou `/home`.
+  atleta) ou `/hub` (hub pessoal — ver seção própria abaixo; deixou de ir direto pra `/home` na
+  sessão 2026-08-05, porque `/home` agora é a home **de um time específico**, e o hub é quem decide
+  pra qual time ir).
 - Claims do access token (JWT) que o front decodifica: `sub` (id do usuário), `name`, `email`,
   `exp`, `iat` — nada de papel/role embutido (ver "Decisões já tomadas", item 3).
 - `/auth/refresh-token` **rotaciona** o refresh token a cada uso (retorna um novo par) — combina com
@@ -270,7 +272,9 @@ divergem ou completam o que o doc técnico define:
 - **Regra do botão `<` (`goBack()`)**: em modo criação, volta = **logout de verdade** (
   `authService.logout()`, que já apaga o refresh token na API — ver seção acima) e manda pra
   `/login`, porque essa tela é etapa obrigatória pós-cadastro, não tem "cancelar e voltar pra
-  algum lugar" sem perfil. Em modo edição, volta só navega pra `/home` — **não desloga**. Hoje só
+  algum lugar" sem perfil. Em modo edição, volta só navega pra `/hub` (era `/home`, ajustado na
+  sessão 2026-08-05 junto com a criação do hub — perfil é dado do usuário, não de um time
+  específico, então faz mais sentido devolver pro espaço pessoal) — **não desloga**. Hoje só
   existe UM ponto de entrada pra essa tela (o redirect do `login.page.ts` quando `!profileCreated`),
   então na prática ela sempre abre em modo criação por enquanto — o modo edição só passa a ser
   alcançável quando existir uma entrada tipo "meu perfil" em algum outro lugar do app.
@@ -332,10 +336,281 @@ divergem ou completam o que o doc técnico define:
   picker de verdade — decisão de escopo pra não introduzir mais um padrão de interação nessa
   rodada, pode virar um `ion-datetime` num modal depois se quiser algo mais robusto.
 
+### Hub pessoal pós-login (sessão 2026-08-05)
+
+Nova tela `/hub` (`src/app/pages/hub/`), inserida no fluxo **entre** login/criação de perfil e a
+home de um time específico:
+
+- **`/home` deixou de ser o destino direto pós-login.** Ela é hoje a home **de um time** (mostra
+  nome do time, papel do usuário naquele time, próximo jogo etc. — ver `home.page.html`), mas o
+  front ainda não tem conceito de "qual time está selecionado" nem rota por `teamId` (`/home` é
+  estático/mock, sempre o mesmo time fake "União da Vila F.C."). O hub é a tela que, no futuro,
+  decide pra qual time navegar; por enquanto `openTeam()` (`hub.page.ts`) manda qualquer filiação
+  `ACTIVE` pra `/home` de qualquer forma, já que só existe essa uma home mockada — **quando
+  `/home` passar a ser por-time de verdade, `openTeam()` precisa navegar com o `teamId` da
+  filiação clicada**, não só pra `/home` fixo.
+- **Fluxo**: `login.page.ts` manda pra `/hub` quando `profileCreated` (antes ia pra `/home`);
+  `profile.page.ts#submit()` (criação/edição de perfil) também passou a mandar pra `/hub` no
+  sucesso (antes `/home`); `profile.page.ts#goBack()` em modo edição também devolve pra `/hub`
+  (ver seção da tela de perfil acima). Ou seja, **hoje o único jeito de chegar em `/home` é
+  clicando numa filiação `ACTIVE` dentro do hub** — não existe mais nenhum redirect direto login →
+  home de time.
+- **Contrato assumido** (mesmo padrão de "front inventa, backend implementa depois" usado pra
+  perfil/foto — `src/app/services/teams.service.ts`):
+
+  | Endpoint | Resposta 2xx |
+  |---|---|
+  | `GET /teams/my-memberships` | `TeamMembership[]` — `{ teamId, teamName, crest?, status: 'PENDING' \| 'ACTIVE', role? }` |
+
+  Ao contrário de `GET /profile` (recurso único, 404 quando não existe → `Profile \| null`), aqui é
+  uma **coleção**: usuário sem nenhum time responde `200` com array vazio, não 404 — "não ter time"
+  é estado normal, não erro. `status` e `role` (`Role` de `role-badge.component.ts`:
+  `PRESIDENT/TREASURER/COUNCIL_MEMBER/PLAYER`) espelham `StatusFiliacao`/`Papel` do doc técnico
+  (seção 4/5, em português: `PENDENTE/ATIVO/INATIVO` e `PRESIDENTE/TESOUREIRO/CONSELHEIRO/JOGADOR`)
+  — **`INATIVO` ainda não tem tratamento no front**, `TeamMembership.status` só cobre
+  `PENDING`/`ACTIVE` por enquanto (decidir se filiação inativa aparece no hub ou fica oculta quando
+  o backend existir).
+- **Comportamento por status**: filiação `ACTIVE` mostra o `role-badge` do papel do usuário
+  naquele time e é clicável (`openTeam()` → `/home`). Filiação `PENDING` mostra uma pill
+  "PENDENTE" (`ion-icon time-outline`) em vez do papel, fica com `opacity: .7` e o clique **não
+  navega** — só um toast avisando que ainda está aguardando aprovação (não existe pra onde ir, já
+  que o usuário não tem acesso a nada do time ainda).
+- **CTAs "Criar time" / "Entrar em um time"** (`app-type-card`, mesmo componente usado noutras
+  telas) aparecem **sempre**, tenha ou não times — mesmo quem já tem time pode querer criar/entrar
+  em outro (multi-time é decisão já tomada, ver `docs/prorrogacao-documentacao-tecnica.md` seção
+  7.4). **Deliberadamente ainda não navegam pra lugar nenhum** — só disparam toast "chega em breve"
+  (`createTeam()`/`joinTeam()` em `hub.page.ts`). Combinado explicitamente nesta sessão: criar as
+  telas de verdade (formulário de criação de time, fluxo de entrar com convite/código) fica pra uma
+  sessão futura, escopo maior que só o hub.
+- **Header sem nome/papel de time** (diferente do header de `/home`): só um `icon-btn` de menu à
+  esquerda e o sino de notificação (com `.dot`) à direita — decisão explícita do usuário nesta
+  sessão, porque o hub é anterior a qualquer time selecionado, não faz sentido mostrar nome/role de
+  time nele. Markup/CSS do header **duplicado localmente** em `hub.page.scss` (mesmo padrão que
+  `home.page.scss` já usa — cada página tem seu próprio header inline, não existe componente
+  compartilhado de header nesse app).
+- **Sem `app-bottom-nav`** no hub — as abas (Início/Elenco/Jogos/Caixa) são todas escopo-de-time,
+  não fazem sentido antes de estar dentro de um time.
+- Saudação com apelido (`ProfileService.getMyProfile()`, mesma chamada real já usada em
+  `profile.page.ts`) — `ionViewWillEnter` (não `ngOnInit`, mesmo motivo do `IonicRouteStrategy`
+  documentado na seção da tela de perfil) refaz `resetState()` + as duas chamadas toda vez que a
+  tela fica ativa.
+
+### Criar time — `Team`/`Membership` implementados de verdade (sessão 2026-08-05)
+
+Primeira fatia real do modelo de autorização combinado com o usuário (salvo em memória,
+`project_membership_authorization_model.md`): a role pertence ao **vínculo** entre usuário e time
+(`Membership`), não ao usuário; nada de role no JWT; autorização sempre resolvida por request
+contra o banco. Esta sessão implementou só **criar time** — solicitar entrada, aprovação de
+membership pendente e o filtro `X-Active-Team` (necessário só quando existirem endpoints
+escopados a um time específico) ficam pra quando "entrar em time" for implementado.
+
+- **Backend (`prorrogacao-api`)**: `model/Team.java` (`id`, `name`, `createdAt` — sem
+  crest/logo, não existe fluxo de upload ainda) e `model/Membership.java` (`team`/`user`
+  `@ManyToOne(LAZY)`, `role`, `type`, `status`, `createdAt`/`updatedAt`), migrations Liquibase
+  `006-create-teams-table.sql`/`007-create-memberships-table.sql` (`UNIQUE(user_id, team_id)` —
+  no máximo um vínculo por pessoa por time). Segue o mesmo padrão **flat por camada técnica** já
+  usado por `auth`/`profile` (`controller/`, `service/`, `model/`, `repository/`, `dto/` — não por
+  domínio como a seção 6 do doc técnico sugere).
+- **Divergência deliberada do ER do doc técnico** (seção 4, `FILIACAO_PAPEL`): lá `papel` é uma
+  tabela N:N (uma filiação pode acumular múltiplos papéis, ex. presidente + tesoureiro
+  simultâneos). Aqui `role` é **uma coluna única** em `Membership` — decisão explícita do usuário
+  passada nesta sessão, um vínculo tem exatamente um papel por vez. Se precisar de acúmulo de
+  papéis no futuro, isso exige migração (virar tabela própria de novo).
+- **Enums novos** (`model/enums/`), sem `@JsonValue`/label em português — diferente de
+  `Position`/`DominantFoot`, serializam como o nome puro do enum (igual `AccountStatus`), porque
+  `role` já é 100% inglês no front desde antes (`role-badge.component.ts`):
+  - `Role { PRESIDENT, TREASURER, COUNCIL_MEMBER, PLAYER }` — mesmos valores do `Role` do front.
+  - `MembershipStatus { PENDING, ACTIVE, INACTIVE }`.
+  - `MembershipType { SUBSCRIBER, CASUAL }` — tradução de mensalista/avulso (termo novo, sem uso
+    ainda no front além do campo opcional `type?` em `TeamMembership`; elenco/financeiro que vão
+    filtrar por `SUBSCRIBER` ainda não existem).
+- **Endpoints**: `POST /teams` (`{ name }` → cria `Team` + `Membership(PRESIDENT, SUBSCRIBER,
+  ACTIVE)` pro usuário autenticado, dono sem aprovação) e `GET /teams/my-memberships` — mesmo
+  contrato que o front já assumia desde a criação do hub, agora implementado de verdade.
+  `SecurityConfig` não precisou mudar (`anyRequest().authenticated()` já cobre `/teams/**`).
+- **Front**: `teams.service.ts` — `TeamMembership.teamId` virou `number` (backend usa
+  `Long`/sequence, não UUID — corrige a divergência que já estava anotada aqui), `MembershipStatus`
+  ganhou `INACTIVE` (ainda sem UI própria — `hub.page.html` só não desenha badge/chevron pra esse
+  caso, aceitável por ora), novo `MembershipType` e `createTeam()`. Nova página `/create-team`
+  (`src/app/pages/create-team/`, só um campo — nome — já que `Team` no backend só tem isso por
+  enquanto), visual igual `create-event` (`app-top-bar` com back, `app-field`, `app-info-box`,
+  `app-button`). `hub.page.ts#createTeam()` deixou de ser toast placeholder e navega pra lá;
+  `joinTeam()` **continua** só toast "chega em breve" — entrar em time é a próxima fatia.
+- Fluxo: `/hub` → "Criar time" → `/create-team` → `submit()` chama `POST /teams` → volta pra
+  `/hub` (recarrega via `ionViewWillEnter` já existente, mostra o time novo `ACTIVE` com badge
+  `PRESIDENT`, clicável pra `/home` — que segue mock fixo sem `teamId`, não mudou nesta sessão).
+
+### Escudo do time — formato + foto (sessão 2026-08-05, mesma sessão de "criar time")
+
+`Team` ganhou `crestUrl`/`crestShape` logo em seguida à implementação inicial (que tinha ficado só
+com `name`) — o usuário pediu, na tela de criar time, uma forma de escolher o "brasão" do time
+(3 formatos) e colocar uma foto/logo dentro dele, parecido com o recorte do `app-player-card`
+(`clip-path: polygon(...)`, ver seção do card estilo FIFA acima).
+
+- **`CrestShape { SHIELD, CIRCLE, HEXAGON }`** (`model/enums/`, backend; reexportado como tipo no
+  front por `team-crest-picker.component.ts`, mesmo padrão do `Role` em `role-badge.component.ts`
+  — o componente compartilhado é quem "dono" do tipo, os services importam dele). `SHIELD` reusa o
+  exato clip-path do `player-card` (`polygon(0% 0%, 100% 0%, 100% 78%, 50% 100%, 0% 78%)`);
+  `CIRCLE` é só `border-radius: 50%`; `HEXAGON` é um segundo clip-path novo. As 3 definições de
+  clip-path estão **duplicadas** em três lugares (`team-crest-picker.component.scss`,
+  `hub.page.scss`, e implicitamente o shield já existia em `player-card.component.scss`) —
+  deliberado, são 2-3 linhas cada e Angular (view encapsulation por componente) não tem um jeito
+  barato de compartilhar só regras CSS entre componentes sem criar um partial SCSS só pra isso.
+- **Novo componente compartilhado `app-team-crest-picker`**
+  (`src/app/shared/components/team-crest-picker/`): preview grande no formato escolhido (tapa nele
+  = escolhe/troca a foto, igual o `photo-area` do `app-player-card`) + 3 "swatches" pequenos (um
+  por formato) abaixo, tap num swatch troca o formato do preview grande. Registrado no
+  `shared.module.ts`.
+- **Fluxo de foto do escudo reaproveita exatamente o padrão de foto de perfil**
+  (`profile.page.ts#pickPhoto/capturePhoto/uploadPhoto`): `ActionSheetController` (tirar
+  foto/galeria/cancelar) → `@capacitor/camera` → preview local imediato (`photo.webPath`) → pede
+  URL pré-assinada → `PUT` no S3 → troca preview pela URL final. **Reaproveita os DTOs genéricos já
+  existentes** (`PhotoUploadUrlRequest`/`PhotoUploadUrlResponse`, que já não tinham nome
+  "profile-específico") em vez de duplicar — só troca a pasta do S3 (`storageService.buildObjectKey("teams", "user-" + userId, ...)`,
+  igual o padrão `"profiles"`/`"user-" + userId` do `ProfileService`, com o mesmo motivo: o time
+  ainda não existe no momento do upload, só existe depois do `POST /teams`, então a key é
+  organizada pelo usuário criador, não pelo `teamId`). Endpoint novo: `POST /teams/photo-upload-url`
+  (mesmo contrato do `POST /profile/photo-upload-url`).
+- **`TeamMembershipResponse`/`TeamMembership` (front)**: o campo `crest` (que nunca chegou a ser
+  usado — sempre vinha `null`, era só um placeholder pro fallback de iniciais) foi **removido e
+  substituído** por `crestUrl?`/`crestShape?`. `hub.page.html` agora mostra o escudo real (`<img>`
+  recortado no `crestShape`, `crestOf()`/`initialsOf()` viraram só o fallback) quando o time tem
+  `crestUrl`; sem foto, cai de volta no `app-avatar` com iniciais, igual antes.
+- **Escudo é opcional na criação** — `CreateTeamRequest.crestUrl`/`crestShape` não têm
+  `@NotBlank`/`@NotNull` no backend; o front sempre manda algum `crestShape` (default `'SHIELD'`
+  no estado do componente, mesmo sem foto escolhida), mas `crestUrl` só vai se o upload tiver dado
+  certo.
+- **Mais campos no `Team`** (mesma sessão, logo em seguida): `foundationDate` (`LocalDate`,
+  `@JsonFormat(dd/MM/yyyy)`, mesmo padrão do `birthDate` do perfil), `city`, `description`
+  (curta, `VARCHAR(280)`) e `homeField` — todos opcionais, sem validação `@NotBlank` no
+  `CreateTeamRequest`. **A migration `006-create-teams-table.sql` foi reescrita in-place** (não
+  ganhou um `007`/`008` incremental) pra incluir essas colunas + `crest_url`/`crest_shape` direto
+  na `CREATE TABLE` — decisão explícita do usuário porque a migration ainda não tinha rodado contra
+  nenhum banco real; **daqui pra frente, qualquer mudança de schema em cima do que já foi
+  aplicado precisa voltar a ser um changeset novo** (não editar um changeset já rodado — isso quebra
+  o checksum do Liquibase). `memberships` continua em `007`.
+- **Data de fundação reaproveita o padrão de data "leve" da tela de perfil**
+  (`app-field` + `ion-popover`/`ion-datetime`, ver seção do perfil acima) — a lógica de máscara
+  dd/mm/aaaa↔ISO que antes só existia em `profile.page.ts` foi **extraída** pra
+  `src/app/shared/date-mask.util.ts` (`maskDateInput`/`ddMMyyyyToIso`/`isoToDdMMyyyy`) na hora de
+  duplicar o mesmo padrão em `create-team.page.ts` — `profile.page.ts` foi refatorado pra usar o
+  util também, sem mudança de comportamento.
+- **Dois gotchas reais de CSS `clip-path` encontrados nessa sessão (ambos reportados pelo usuário
+  via print, ambos com causa raiz confirmada por render isolado fora do app antes do fix, num
+  HTML estático temporário — não versionado, só usado durante o diagnóstico):**
+  1. **`box-shadow` não acompanha `clip-path`.** Sempre desenha no box retangular original do
+     elemento. O anel de destaque do formato ativo em `app-team-crest-picker` usava `box-shadow`,
+     criando um retângulo dourado visível por cima do escudo recortado. Fix: `filter:
+     drop-shadow(...)` no lugar — `drop-shadow` respeita o alfa real da forma renderizada (mesma
+     técnica já usada no brilho do `app-player-card` inteiro).
+  2. **`border` não acompanha a diagonal do `clip-path`.** `border` só é desenhado nas bordas do
+     retângulo original do elemento — na diagonal do `SHIELD`/`HEXAGON` (que corta por dentro
+     desse retângulo) não sobra nenhum traço, só o preenchimento sem contorno, dando a impressão de
+     "escudo cortado" bem na base (exatamente o que o usuário reportou — via prints
+     `docs/img.png`/`docs/img_1.png` inicialmente sem detalhe suficiente, depois confirmado com um
+     crop bem próximo mostrando a borda simplesmente parando no fim do lado reto). O preview grande
+     (`.crest-preview-wrap`) nunca teve esse problema porque não usa `border` — usa duas camadas
+     **irmãs** (não aninhadas, ambas `position: absolute` dentro do mesmo wrapper `relative`):
+     `.crest-border` (cor sólida dourada, `clip-path`, `inset: 0`) por baixo + `.crest-preview`
+     (fundo escuro próprio + a foto dentro, mesmo `clip-path`, `inset` de alguns px) por cima —
+     o "anel" que sobra entre as duas acompanha o contorno inteiro, incluindo diagonais. Fix:
+     `.shape-option` (`team-crest-picker.component.scss`, usa `::after` como a camada de cima já
+     que é um `<button>` sem filho) e `.crest-thumb` (`hub.page.scss`) passaram a usar a mesma
+     técnica de duas camadas em vez de `border`.
+  **Regra geral pra qualquer elemento futuro com `clip-path` não-retangular/não-circular
+  (`border-radius`)**: nunca usar `border` nem `box-shadow` pra contorno/destaque — sempre a
+  técnica de duas camadas (cor sólida atrás, conteúdo recuado na frente, mesmo `clip-path` nas
+  duas) ou `filter: drop-shadow`.
+  - **Cuidado extra pra camadas que carregam imagem** (fotos de usuário, que podem falhar/demorar
+    a carregar): a camada de cima **precisa ter fundo sólido próprio** por trás da `<img>` (não só
+    a `<img>` sozinha inset sobre a camada dourada) — senão, foto quebrada/lenta = dourado sólido
+    tomando conta do escudo inteiro (bug real, reportado pelo usuário logo depois do fix acima —
+    a primeira versão do fix tinha virado só a `<img>` inset direto sobre o fundo dourado, sem
+    fundo escuro próprio por trás). A camada de cima sempre precisa de 3 níveis: wrapper
+    (`relative`, sem estilo visual) → camada dourada (`absolute inset:0`) + camada de conteúdo
+    (fundo `--p-card2` PRÓPRIO, `absolute inset` de alguns px, `overflow:hidden`, contém a
+    `<img>` **sem** `clip-path` próprio — o `clip-path` da camada já corta o conteúdo inteiro,
+    incluindo a imagem, não precisa repetir na tag `<img>`).
+- **Extraído `app-crest-badge` compartilhado** (`src/app/shared/components/crest-badge/`,
+  registrado no `shared.module.ts`) depois que a mesma estrutura de 3 níveis acima ia ser
+  duplicada pela **terceira vez** (hub, agora busca de times) — vira o ponto de virada certo pra
+  extrair (não é abstração prematura, é a mesma lógica não-trivial com gotcha documentado se
+  repetindo). Inputs: `crestUrl`, `crestShape`, `size`, `fallbackLabel` (iniciais quando não tem
+  foto), `avatarVariant` (repassado pro `app-avatar` do fallback). `hub.page.html` foi refatorado
+  pra usar esse componente em vez do bloco de 3 divs inline (CSS/método `crestShapeClass()`
+  correspondentes foram removidos do hub). **O preview grande do `app-team-crest-picker`
+  continua separado** (não usa `app-crest-badge`) — ali tem preocupações a mais que não cabem num
+  badge só-leitura: seleção interativa de formato, badge de câmera pra trocar foto, brilho
+  `drop-shadow` do card inteiro.
+- **Recorte do `SHIELD`/`HEXAGON` do escudo do time é o mesmo do `app-player-card` (78%/25%),
+  DE PROPÓSITO.** Chegamos a tentar suavizar o taper (88%/12%) achando que o corte agressivo comia
+  parte da foto/logo — mas essa não era a causa raiz real (era o bug de `border` acima) e, em
+  elementos pequenos (42px/36px), esse recorte quase imperceptível fazia a forma parecer quebrada
+  (quase um retângulo com uma pontinha), pior do que o original. Revertido. Recorte perceptível o
+  bastante pra formato ser reconhecível > preservar cada pixel da foto — cortar parte de uma
+  foto/logo dentro de um formato escolhido é comportamento esperado desse tipo de picker (mesma
+  lógica de crop de avatar circular), não é bug.
+- **`create-team.page.ts` ganhou `ionViewWillEnter` com reset de estado** (mesmo motivo do
+  `IonicRouteStrategy` documentado na seção da tela de perfil — a página é cacheada pelo router, não
+  recriada) — sem isso, criar um time, voltar pro hub e entrar de novo em "Criar time" reapareceria
+  com os campos da tentativa anterior ainda preenchidos.
+
+### Buscar/entrar em time — `/join-team` (sessão 2026-08-06)
+
+Segunda fatia do fluxo de "entrar em time" (a primeira foi só o botão placeholder no hub). Busca
+paginada com infinite scroll + solicitação de entrada — a **aprovação** (quem decide
+mensalista/avulso) continua fora de escopo, é a próxima fatia.
+
+- **Backend**: `GET /teams/search?query=&page=&size=` — busca por `name` OU `city` OU
+  `homeField` (`ContainingIgnoreCase`, case-insensitive, paginado via `Pageable`/`Page<Team>` do
+  Spring Data, mapeado pra um DTO próprio em vez de serializar `Page` direto). Query em branco
+  responde página vazia sem nem tocar o banco (`query.isBlank()` guard em `TeamService`) — o
+  gate de "precisa digitar algo" é reforçado nos dois lados, não só no front. Cada resultado
+  (`TeamSearchResult`) traz `crestUrl`/`crestShape`, `city`, `homeField`, `memberCount` (só
+  membros `ACTIVE`, contados em **lote** por uma query `GROUP BY` — `MembershipRepository
+  .countByTeamIdInAndStatus` + projection `TeamMemberCount` — pra não fazer N+1 uma query de
+  contagem por time da página) e `myMembershipStatus` (o vínculo do usuário logado com aquele
+  time, se existir — resolvido comparando com `membershipRepository.findByUserId(userId)` já
+  carregado uma vez, não uma query por resultado). `POST /teams/{teamId}/membership-requests` cria
+  `Membership(role=PLAYER, status=PENDING, type=null)` — `type` fica **null de propósito**, só é
+  decidido na aprovação (que ainda não existe) — por isso `type` em `memberships` não é
+  `NOT NULL` (`007-create-memberships-table.sql` — a coluna nasceu nullable direto na criação da
+  tabela; chegou a existir um incremento `008` separado só pra isso, mas foi fundido de volta pra
+  dentro do `007` porque a migration ainda não tinha rodado contra nenhum banco real quando isso
+  foi pedido — **daqui pra frente, qualquer mudança em cima do que já rodou precisa ser um
+  changeset novo**, não dá mais pra editar `006`/`007` em place). Bloqueia duplicata
+  via `existsByUserIdAndTeamId` antes de inserir (`DuplicateMembershipRequestException`, 409
+  `DUPLICATE_MEMBERSHIP_REQUEST`) — **inclusive contra uma filiação `INACTIVE` antiga**, ou seja
+  reativar um vínculo antigo não é suportado ainda (bloqueia igual duplicata nova), fica pra
+  quando o fluxo de aprovação/remoção existir de verdade.
+- **Front**: campo de busca com **debounce de 1.2s** (`debounceTime` + `distinctUntilChanged` +
+  `switchMap`, RxJS) — `switchMap` é o que garante que uma busca mais nova cancela a anterior que
+  ainda não respondeu (sem isso, uma resposta antiga lenta podia sobrescrever um resultado mais
+  novo). Campo vazio não dispara nada (`onQueryInput` já corta antes de chegar no `Subject`).
+  Resultados carregam via `ion-infinite-scroll` (`(ionInfinite)="loadMore($event)"`,
+  `[disabled]="!canLoadMore"` — só habilitado depois de já ter buscado algo E ainda ter próxima
+  página), 15 por página. Solicitar entrada (`requestToJoinTeam`) atualiza o card localmente
+  (`myMembershipStatus = 'PENDING'`) sem precisar re-buscar — e como o hub já lê
+  `GET /teams/my-memberships` (que traz PENDING também) toda vez que reabre, o pedido novo aparece
+  lá sozinho.
+- Botão de ação por resultado: sem vínculo → botão circular dourado (ícone `person-add-outline`,
+  chama `requestToJoin`); `PENDING`/`ACTIVE` → pill de status (mesmo estilo `pending-pill` do hub),
+  sem interação — evita pedido duplicado por engano batendo em algo que já mostra "PENDENTE"/
+  "MEMBRO".
+
 ### Próximo passo combinado
 
-Módulo `auth` do `prorrogacao-api` implementado (2026-08-02), incluindo `/auth/logout`. Backend
-ainda precisa: módulo `usuario`/perfil (`GET/PUT /profile`) e a infra de upload de foto (S3 +
-`POST /profile/photo-upload-url`) pra tela de perfil funcionar de ponta a ponta — contrato assumido
-documentado acima. Depois: `time`/filiação (que é onde `numero_camisa` de verdade mora), seguindo a
-estrutura de camadas da seção 6 do doc técnico (`config`, `auth`, `usuario`, `time`, ...).
+Módulo `auth` do `prorrogacao-api` implementado (2026-08-02), incluindo `/auth/logout`. Módulo
+`profile` (`GET/PUT /profile`) implementado; infra de upload de foto (S3 real,
+`POST /profile/photo-upload-url`) **ainda não** — ver seção da tela de perfil acima. Módulo `time`:
+criar time, buscar/solicitar entrada (`GET /teams/search`, `POST /teams/{id}/membership-requests`)
+implementados — ver seções acima. **Ainda falta**: aprovação de membership pendente (tela pro
+presidente ver quem solicitou entrada em `PENDING` e decidir `role`/`type`
+mensalista-ou-avulso/`ACTIVE` — é o que faz `Membership.type` deixar de ser `null`), reativação de
+filiação `INACTIVE` (hoje bloqueada como duplicata, sem fluxo próprio), e o filtro
+`X-Active-Team`/segundo `OncePerRequestFilter` de autorização por time (só passa a ser necessário
+quando existir algum endpoint escopado a um time específico — elenco, financeiro, eventos etc. —
+nenhum desses módulos existe ainda). Quando `home.page.ts`/`.html` deixar de ser mock fixo, vai
+precisar receber o `teamId` vindo do hub (rota tipo `/home/:teamId` ou guardar o time ativo em
+algum serviço/estado) — `hub.page.ts#openTeam()` hoje sempre manda pra `/home` sem `teamId`
+nenhum.

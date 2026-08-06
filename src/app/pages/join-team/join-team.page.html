@@ -1,0 +1,71 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="ENTRAR EM TIME" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <app-field
+      icon="search-outline"
+      placeholder="Nome, cidade ou local de jogo..."
+      [value]="query"
+      (valueChange)="onQueryInput($event)"
+    ></app-field>
+
+    <div class="hint" *ngIf="!hasSearched && !loading">
+      <ion-icon name="search-outline"></ion-icon>
+      <p>Digite algo pra buscar times — nome, cidade ou onde costuma jogar.</p>
+    </div>
+
+    <div class="loading-state" *ngIf="loading && results.length === 0">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <div class="results" *ngIf="results.length > 0">
+      <div class="team-result tap" *ngFor="let team of results" (click)="onCardClick(team)">
+        <app-crest-badge
+          [crestUrl]="team.crestUrl"
+          [crestShape]="team.crestShape"
+          [size]="46"
+          [fallbackLabel]="crestOf(team.teamName)"
+        ></app-crest-badge>
+
+        <div class="info">
+          <div class="name">{{ team.teamName }}</div>
+          <div class="meta" *ngIf="team.city || team.homeField">
+            <span *ngIf="team.city"><ion-icon name="location-outline"></ion-icon>{{ team.city }}</span>
+            <span *ngIf="team.homeField"><ion-icon name="flag-outline"></ion-icon>{{ team.homeField }}</span>
+          </div>
+          <div class="member-count">
+            <ion-icon name="people-outline"></ion-icon>{{ team.memberCount }} membro{{ team.memberCount === 1 ? '' : 's' }}
+          </div>
+        </div>
+
+        <div class="action">
+          <button
+            class="join-btn tap"
+            *ngIf="!team.myMembershipStatus"
+            [disabled]="requestingTeamId === team.teamId"
+            (click)="requestToJoin(team); $event.stopPropagation()"
+          >
+            <ion-spinner *ngIf="requestingTeamId === team.teamId" name="crescent"></ion-spinner>
+            <ion-icon *ngIf="requestingTeamId !== team.teamId" name="person-add-outline"></ion-icon>
+          </button>
+          <span class="status-pill" *ngIf="team.myMembershipStatus === 'PENDING'">PENDENTE</span>
+          <span class="status-pill active" *ngIf="team.myMembershipStatus === 'ACTIVE'">MEMBRO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="hasSearched && !loading && results.length === 0">
+      <ion-icon name="shield-outline"></ion-icon>
+      <div class="empty-title">Nenhum time encontrado</div>
+      <div class="empty-sub">Tenta buscar por outro nome, cidade ou local de jogo.</div>
+    </div>
+  </div>
+
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)" [disabled]="!canLoadMore">
+    <ion-infinite-scroll-content loadingSpinner="crescent"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

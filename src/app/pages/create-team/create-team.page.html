@@ -1,0 +1,60 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="CRIAR TIME" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <app-eyebrow>ESCUDO DO TIME</app-eyebrow>
+    <app-team-crest-picker
+      [shape]="crestShape"
+      [photoUrl]="crestPreviewUrl"
+      [photoUploading]="crestUploading"
+      (shapeChange)="onCrestShapeChange($event)"
+      (photoTap)="pickCrestPhoto()"
+    ></app-team-crest-picker>
+
+    <app-eyebrow>NOME DO TIME</app-eyebrow>
+    <app-field icon="shield-outline" placeholder="Ex.: União da Vila F.C." [(value)]="name"></app-field>
+
+    <app-eyebrow>DATA DE FUNDAÇÃO (OPCIONAL)</app-eyebrow>
+    <app-field
+      icon="calendar-outline"
+      placeholder="dd/mm/aaaa"
+      [value]="foundationDate"
+      (valueChange)="onFoundationDateInput($event)"
+      [maxlength]="10"
+      [iconClickable]="true"
+      (iconClick)="openFoundationDatePicker($event)"
+    ></app-field>
+
+    <app-eyebrow>CIDADE (OPCIONAL)</app-eyebrow>
+    <app-field icon="location-outline" placeholder="Ex.: São Paulo" [(value)]="city"></app-field>
+
+    <app-eyebrow>CAMPO/LOCAL DE JOGO (OPCIONAL)</app-eyebrow>
+    <app-field icon="flag-outline" placeholder="Ex.: Campo do Zé Pretão" [(value)]="homeField"></app-field>
+
+    <app-eyebrow>DESCRIÇÃO (OPCIONAL)</app-eyebrow>
+    <app-field icon="document-text-outline" placeholder="Uma frase sobre o time" [(value)]="description"></app-field>
+
+    <div class="info-wrap">
+      <app-info-box>Você vira o presidente do time assim que ele for criado.</app-info-box>
+    </div>
+
+    <app-button icon="checkmark-outline" [disabled]="!isFormValid" [loading]="loading" (pressed)="submit()">
+      CRIAR TIME
+    </app-button>
+  </div>
+</ion-content>
+
+<ion-popover #foundationDatePopover>
+  <ng-template>
+    <ion-datetime
+      presentation="date"
+      [max]="today"
+      [value]="foundationDateIso"
+      (ionChange)="onFoundationDateSelected($event)"
+    ></ion-datetime>
+  </ng-template>
+</ion-popover>

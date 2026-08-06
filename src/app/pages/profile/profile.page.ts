@@ -5,6 +5,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Profile, ProfileService } from '../../services/profile.service';
+import { ddMMyyyyToIso, isoToDdMMyyyy, maskDateInput } from '../../shared/date-mask.util';
 import { getErrorMessage } from '../../shared/http-error.util';
 
 const POSITIONS = ['Goleiro', 'Zagueiro', 'Lateral', 'Volante', 'Meia', 'Atacante'];
@@ -141,9 +142,7 @@ export class ProfilePage implements ViewWillEnter {
   }
 
   get birthDateIso(): string | undefined {
-    const [day, month, year] = this.birthDate.split('/');
-    if (!day || !month || year?.length !== 4) return undefined;
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    return ddMMyyyyToIso(this.birthDate);
   }
 
   selectPosition(position: string): void {
@@ -158,22 +157,7 @@ export class ProfilePage implements ViewWillEnter {
   }
 
   onBirthDateInput(raw: string): void {
-    const digits = raw.replace(/\D/g, '').slice(0, 8);
-    let day = digits.slice(0, 2);
-    let month = digits.slice(2, 4);
-    const year = digits.slice(4, 8);
-
-    if (day.length === 2) {
-      day = String(Math.min(31, Math.max(1, Number(day)))).padStart(2, '0');
-    }
-    if (month.length === 2) {
-      month = String(Math.min(12, Math.max(1, Number(month)))).padStart(2, '0');
-    }
-
-    let formatted = day;
-    if (digits.length > 2) formatted += '/' + month;
-    if (digits.length > 4) formatted += '/' + year;
-    this.birthDate = formatted;
+    this.birthDate = maskDateInput(raw);
   }
 
   openBirthDatePicker(event: MouseEvent): void {
@@ -183,8 +167,7 @@ export class ProfilePage implements ViewWillEnter {
   onDateSelected(event: CustomEvent<{ value?: string | string[] | null }>): void {
     const iso = event.detail.value;
     if (typeof iso === 'string') {
-      const [year, month, day] = iso.substring(0, 10).split('-');
-      this.birthDate = `${day}/${month}/${year}`;
+      this.birthDate = isoToDdMMyyyy(iso);
     }
     this.birthDatePopover?.dismiss();
   }
@@ -220,7 +203,7 @@ export class ProfilePage implements ViewWillEnter {
 
   goBack(): void {
     if (this.isEditMode) {
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/hub');
       return;
     }
     this.authService.logout();
@@ -247,7 +230,7 @@ export class ProfilePage implements ViewWillEnter {
     this.profileService.saveProfile(payload).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigateByUrl('/home');
+        this.router.navigateByUrl('/hub');
       },
       error: (error) => {
         this.loading = false;

@@ -30,6 +30,21 @@ const routes: Routes = [
     loadChildren: () => import('./pages/profile/profile.module').then( m => m.ProfilePageModule)
   },
   {
+    path: 'hub',
+    canActivate: [authGuard],
+    loadChildren: () => import('./pages/hub/hub.module').then( m => m.HubPageModule)
+  },
+  {
+    path: 'create-team',
+    canActivate: [authGuard],
+    loadChildren: () => import('./pages/create-team/create-team.module').then( m => m.CreateTeamPageModule)
+  },
+  {
+    path: 'join-team',
+    canActivate: [authGuard],
+    loadChildren: () => import('./pages/join-team/join-team.module').then( m => m.JoinTeamPageModule)
+  },
+  {
     path: 'home',
     canActivate: [authGuard],
     loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)

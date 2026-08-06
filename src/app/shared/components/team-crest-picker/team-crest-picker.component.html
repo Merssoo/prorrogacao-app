@@ -1,0 +1,28 @@
+<div class="crest-picker">
+  <div class="crest-preview-wrap tap" (click)="photoTap.emit()">
+    <div class="crest-border" [ngClass]="shapeClass(shape)"></div>
+    <div class="crest-preview" [ngClass]="shapeClass(shape)">
+      <img *ngIf="photoUrl" [src]="photoUrl" alt="" />
+      <div class="crest-placeholder" *ngIf="!photoUrl">
+        <ion-icon name="shield-outline"></ion-icon>
+      </div>
+      <div class="crest-uploading" *ngIf="photoUploading">
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+    </div>
+    <div class="crest-edit-badge" *ngIf="!photoUploading">
+      <ion-icon name="camera-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="shape-options">
+    <button
+      type="button"
+      class="shape-option tap"
+      *ngFor="let option of shapes"
+      [ngClass]="shapeClass(option)"
+      [class.active]="option === shape"
+      (click)="selectShape(option)"
+    ></button>
+  </div>
+</div>

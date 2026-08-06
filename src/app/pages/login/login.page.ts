@@ -31,7 +31,7 @@ export class LoginPage {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (response) => {
         this.loading = false;
-        this.router.navigateByUrl(response.profileCreated ? '/home' : '/profile');
+        this.router.navigateByUrl(response.profileCreated ? '/hub' : '/profile');
       },
       error: (error) => {
         this.loading = false;
