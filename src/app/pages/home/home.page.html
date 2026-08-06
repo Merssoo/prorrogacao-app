@@ -1,12 +1,12 @@
 <ion-header>
   <div class="header-wrap home-header">
     <div class="left">
-      <div class="icon-btn">
+      <div class="icon-btn tap" (click)="openMenu()">
         <ion-icon name="menu-outline"></ion-icon>
       </div>
       <div>
-        <div class="bebas team-name">UNIÃO DA VILA F.C.</div>
-        <div class="role-row"><app-role-badge role="PRESIDENT"></app-role-badge></div>
+        <div class="bebas team-name">{{ teamName }}</div>
+        <div class="role-row" *ngIf="role"><app-role-badge [role]="role"></app-role-badge></div>
       </div>
     </div>
     <div class="bell-wrap">
@@ -84,6 +84,6 @@
 
 <ion-footer>
   <div class="footer-wrap">
-    <app-bottom-nav active="Início"></app-bottom-nav>
+    <app-bottom-nav (itemClick)="onNavItem($event)"></app-bottom-nav>
   </div>
 </ion-footer>

@@ -25,6 +25,7 @@ import { PlayerCardComponent } from './components/player-card/player-card.compon
 import { JerseyNumberPickerComponent } from './components/jersey-number-picker/jersey-number-picker.component';
 import { TeamCrestPickerComponent } from './components/team-crest-picker/team-crest-picker.component';
 import { CrestBadgeComponent } from './components/crest-badge/crest-badge.component';
+import { SideMenuComponent } from './components/side-menu/side-menu.component';
 
 const COMPONENTS = [
   TopBarComponent,
@@ -49,6 +50,7 @@ const COMPONENTS = [
   JerseyNumberPickerComponent,
   TeamCrestPickerComponent,
   CrestBadgeComponent,
+  SideMenuComponent,
 ];
 
 @NgModule({

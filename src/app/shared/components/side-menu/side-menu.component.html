@@ -1,0 +1,41 @@
+<ion-menu [menuId]="menuId" contentId="main-content" side="start" type="overlay" [disabled]="context === null">
+  <ion-header>
+    <div class="menu-header">
+      <span class="bebas menu-title">MENU</span>
+    </div>
+  </ion-header>
+
+  <ion-content class="menu-content">
+    <div class="menu-section" *ngIf="isHub">
+      <app-eyebrow>TIME</app-eyebrow>
+      <div class="menu-item tap" (click)="createTeam()">
+        <ion-icon name="add-circle-outline"></ion-icon>
+        <span>Criar time</span>
+      </div>
+      <div class="menu-item tap" (click)="joinTeam()">
+        <ion-icon name="enter-outline"></ion-icon>
+        <span>Entrar em um time</span>
+      </div>
+    </div>
+
+    <div class="menu-section" *ngIf="isHome">
+      <app-eyebrow>TIME</app-eyebrow>
+      <div class="menu-item tap" (click)="goToHub()">
+        <ion-icon name="shield-outline"></ion-icon>
+        <span>Meus times</span>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <app-eyebrow>CONTA</app-eyebrow>
+      <div class="menu-item tap" (click)="editProfile()">
+        <ion-icon name="person-outline"></ion-icon>
+        <span>Editar perfil</span>
+      </div>
+      <div class="menu-item tap danger" (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        <span>Sair</span>
+      </div>
+    </div>
+  </ion-content>
+</ion-menu>

@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController, ViewWillEnter } from '@ionic/angular';
+import { MenuController, ToastController, ViewWillEnter } from '@ionic/angular';
 import { ProfileService } from '../../services/profile.service';
 import { TeamMembership, TeamsService } from '../../services/teams.service';
 import { getErrorMessage } from '../../shared/http-error.util';
+import { MAIN_MENU_ID } from '../../shared/components/side-menu/side-menu.component';
+import { ActiveTeamService } from '../../services/active-team.service';
 
 function initialsOf(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
@@ -28,7 +30,13 @@ export class HubPage implements ViewWillEnter {
     private readonly profileService: ProfileService,
     private readonly teamsService: TeamsService,
     private readonly toastController: ToastController,
+    private readonly menuController: MenuController,
+    private readonly activeTeamService: ActiveTeamService,
   ) {}
+
+  openMenu(): void {
+    this.menuController.open(MAIN_MENU_ID);
+  }
 
   ionViewWillEnter(): void {
     this.resetState();
@@ -70,6 +78,13 @@ export class HubPage implements ViewWillEnter {
     if (membership.status === 'PENDING') {
       this.showToast('Seu pedido para entrar nesse time ainda está pendente de aprovação.', 'medium');
       return;
+    }
+    if (membership.role) {
+      this.activeTeamService.setActiveTeam({
+        teamId: membership.teamId,
+        teamName: membership.teamName,
+        role: membership.role,
+      });
     }
     this.router.navigateByUrl('/home');
   }

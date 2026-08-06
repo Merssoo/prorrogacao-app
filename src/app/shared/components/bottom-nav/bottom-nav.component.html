@@ -1,5 +1,10 @@
 <div class="bottom-nav">
-  <div class="nav-item tap" *ngFor="let item of items" [class.on]="item.label === active">
+  <div
+    class="nav-item tap"
+    *ngFor="let item of items"
+    [class.on]="item.label === active"
+    (click)="itemClick.emit(item.label)"
+  >
     <ion-icon [name]="item.icon"></ion-icon>
     <span>{{ item.label }}</span>
   </div>

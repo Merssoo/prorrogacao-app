@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface NavItem {
   label: string;
@@ -12,10 +12,11 @@ interface NavItem {
   styleUrls: ['./bottom-nav.component.scss'],
 })
 export class BottomNavComponent {
-  @Input() active = 'Início';
+  @Input() active = '';
+  @Output() itemClick = new EventEmitter<string>();
 
   readonly items: NavItem[] = [
-    { label: 'Início', icon: 'home-outline' },
+    { label: 'Times', icon: 'shield-outline' },
     { label: 'Elenco', icon: 'people-outline' },
     { label: 'Jogos', icon: 'calendar-outline' },
     { label: 'Caixa', icon: 'wallet-outline' },

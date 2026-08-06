@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable, firstValueFrom, from, map, switchMap } from 'rxjs';
 import { ApiService } from './api.service';
 import { SecureStorageService } from './secure-storage.service';
+import { ActiveTeamService } from './active-team.service';
 import { environment } from '../../environments/environment';
 
 export interface JwtPayload {
@@ -51,6 +52,7 @@ export class AuthService {
   constructor(
     private readonly apiService: ApiService,
     private readonly storage: SecureStorageService,
+    private readonly activeTeamService: ActiveTeamService,
     private readonly router: Router,
     httpBackend: HttpBackend,
   ) {
@@ -152,6 +154,7 @@ export class AuthService {
       }
     }
     await this.storage.clear();
+    this.activeTeamService.clearActiveTeam();
     this.authStateSubject.next(false);
     this.currentUserSubject.next(null);
     await this.router.navigate(['/login']);
