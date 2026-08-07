@@ -14,6 +14,7 @@ export class PlayerCardComponent implements OnDestroy {
   @Input() dominantFoot = '';
   @Input() jerseyNumber: number | null = null;
   @Input() photoUploading = false;
+  @Input() readOnly = false;
   @Input() attackRating: number | null = null;
   @Input() defenseRating: number | null = null;
   @Input() physicalRating: number | null = null;

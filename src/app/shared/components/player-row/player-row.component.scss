@@ -24,3 +24,17 @@
   padding: 4px 8px;
   border-radius: 6px;
 }
+
+.options-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 2px;
+  flex-shrink: 0;
+  color: var(--p-muted);
+
+  ion-icon {
+    font-size: 18px;
+  }
+}

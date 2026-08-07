@@ -4,6 +4,7 @@ import { SecureStorage } from '@aparajita/capacitor-secure-storage';
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const ACTIVE_TEAM_ID_KEY = 'active_team_id';
 const WEB_DB_NAME = 'prorrogacao-auth';
 const WEB_DB_STORE = 'tokens';
 
@@ -53,8 +54,28 @@ export class SecureStorageService {
     await this.webIdbRemove(REFRESH_TOKEN_KEY);
   }
 
+  async getActiveTeamId(): Promise<string | null> {
+    return this.isNative ? this.nativeGet(ACTIVE_TEAM_ID_KEY) : this.webIdbGet(ACTIVE_TEAM_ID_KEY);
+  }
+
+  async setActiveTeamId(teamId: string): Promise<void> {
+    if (this.isNative) {
+      await this.nativeSet(ACTIVE_TEAM_ID_KEY, teamId);
+      return;
+    }
+    await this.webIdbSet(ACTIVE_TEAM_ID_KEY, teamId);
+  }
+
+  async removeActiveTeamId(): Promise<void> {
+    if (this.isNative) {
+      await this.nativeRemove(ACTIVE_TEAM_ID_KEY);
+      return;
+    }
+    await this.webIdbRemove(ACTIVE_TEAM_ID_KEY);
+  }
+
   async clear(): Promise<void> {
-    await Promise.all([this.removeAccessToken(), this.removeRefreshToken()]);
+    await Promise.all([this.removeAccessToken(), this.removeRefreshToken(), this.removeActiveTeamId()]);
   }
 
   private async nativeGet(key: string): Promise<string | null> {

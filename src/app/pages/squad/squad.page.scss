@@ -37,3 +37,32 @@
     line-height: 1.4;
   }
 }
+
+.player-detail-modal {
+  --width: min(300px, 88vw);
+  --height: auto;
+  --border-radius: var(--p-radius-xl);
+  --background: transparent;
+  --box-shadow: none;
+}
+
+.modal-body {
+  position: relative;
+  padding: 34px 14px 14px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--p-card);
+  color: var(--p-chalk);
+  font-size: 18px;
+  z-index: 1;
+}

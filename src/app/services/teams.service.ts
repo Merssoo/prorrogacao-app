@@ -62,14 +62,35 @@ export interface SquadMember {
   photoUrl?: string;
   position?: string;
   secondaryPosition?: string;
+  dominantFoot?: string;
   jerseyNumber?: number;
   role: Role;
   type?: MembershipType;
+  attackRating?: number;
+  defenseRating?: number;
+  physicalRating?: number;
+  skillRating?: number;
 }
 
 export interface Squad {
   subscribers: SquadMember[];
   casuals: SquadMember[];
+}
+
+export interface MembershipRequest {
+  membershipId: number;
+  userId: number;
+  nickname: string;
+  photoUrl?: string;
+  position?: string;
+  secondaryPosition?: string;
+  dominantFoot?: string;
+  jerseyNumber?: number;
+  requestedAt: string;
+  attackRating?: number;
+  defenseRating?: number;
+  physicalRating?: number;
+  skillRating?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -111,5 +132,29 @@ export class TeamsService {
 
   getSquad(): Observable<Squad> {
     return this.apiService.get<Squad>(`${this.endpoint}/squad`);
+  }
+
+  getMembershipRequests(): Observable<MembershipRequest[]> {
+    return this.apiService.get<MembershipRequest[]>(`${this.endpoint}/membership-requests`);
+  }
+
+  approveMembershipRequest(membershipId: number, type: MembershipType): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.endpoint}/membership-requests/${membershipId}/approve`, { type });
+  }
+
+  updateMemberType(userId: number, type: MembershipType): Observable<{ message?: string }> {
+    return this.apiService.patch(`${this.endpoint}/squad/${userId}/type`, { type });
+  }
+
+  updateMemberRole(userId: number, role: Role): Observable<{ message?: string }> {
+    return this.apiService.patch(`${this.endpoint}/squad/${userId}/role`, { role });
+  }
+
+  removeMember(userId: number): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.endpoint}/squad/${userId}/remove`, {});
+  }
+
+  transferPresidency(userId: number): Observable<{ message?: string }> {
+    return this.apiService.post(`${this.endpoint}/squad/${userId}/transfer-presidency`, {});
   }
 }

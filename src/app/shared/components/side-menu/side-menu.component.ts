@@ -48,6 +48,10 @@ export class SideMenuComponent implements OnInit, OnDestroy {
     return this.context === 'home';
   }
 
+  get isPresident(): boolean {
+    return this.activeTeamService.getActiveRole() === 'PRESIDENT';
+  }
+
   createTeam(): void {
     this.navigateAndClose('/create-team');
   }
@@ -59,6 +63,10 @@ export class SideMenuComponent implements OnInit, OnDestroy {
   goToHub(): void {
     this.activeTeamService.clearActiveTeam();
     this.navigateAndClose('/hub');
+  }
+
+  goToMembershipRequests(): void {
+    this.navigateAndClose('/membership-requests');
   }
 
   async editProfile(): Promise<void> {

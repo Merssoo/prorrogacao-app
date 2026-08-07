@@ -20,6 +20,10 @@
 
     <div class="menu-section" *ngIf="isHome">
       <app-eyebrow>TIME</app-eyebrow>
+      <div class="menu-item tap" *ngIf="isPresident" (click)="goToMembershipRequests()">
+        <ion-icon name="person-add-outline"></ion-icon>
+        <span>Pedidos de entrada</span>
+      </div>
       <div class="menu-item tap" (click)="goToHub()">
         <ion-icon name="shield-outline"></ion-icon>
         <span>Meus times</span>

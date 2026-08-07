@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -10,4 +10,7 @@ export class PlayerRowComponent {
   @Input() name = '';
   @Input() pos = '';
   @Input() initials = '';
+  @Input() photoUrl: string | null | undefined = null;
+  @Input() showOptions = false;
+  @Output() optionsTap = new EventEmitter<void>();
 }

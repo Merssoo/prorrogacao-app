@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { activeTeamGuard } from './guards/active-team.guard';
 
 const routes: Routes = [
   {
@@ -46,42 +47,47 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
   },
   {
     path: 'squad',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/squad/squad.module').then( m => m.SquadPageModule)
   },
   {
+    path: 'membership-requests',
+    canActivate: [authGuard, activeTeamGuard],
+    loadChildren: () => import('./pages/membership-requests/membership-requests.module').then( m => m.MembershipRequestsPageModule)
+  },
+  {
     path: 'create-event',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/create-event/create-event.module').then( m => m.CreateEventPageModule)
   },
   {
     path: 'event',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/event/event.module').then( m => m.EventPageModule)
   },
   {
     path: 'draft',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/draft/draft.module').then( m => m.DraftPageModule)
   },
   {
     path: 'ratings',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/ratings/ratings.module').then( m => m.RatingsPageModule)
   },
   {
     path: 'voting',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/voting/voting.module').then( m => m.VotingPageModule)
   },
   {
     path: 'finance',
-    canActivate: [authGuard],
+    canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/finance/finance.module').then( m => m.FinancePageModule)
   },
 ];

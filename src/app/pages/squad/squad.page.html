@@ -23,14 +23,40 @@
           title="MENSALISTAS"
           color="var(--p-gold)"
           [players]="subscribers"
+          [showOptions]="true"
+          (optionsTap)="onMemberOptions($event)"
         ></app-player-group>
         <app-player-group
           *ngIf="casuals.length > 0"
           title="AVULSOS"
           color="var(--p-blue)"
           [players]="casuals"
+          [showOptions]="true"
+          (optionsTap)="onMemberOptions($event)"
         ></app-player-group>
       </ng-container>
     </ng-container>
   </div>
+
+  <ion-modal class="player-detail-modal" [isOpen]="selectedMember !== null" (didDismiss)="closeMemberModal()">
+    <ng-template>
+      <div class="modal-body" *ngIf="selectedMember as member">
+        <div class="close-btn tap" (click)="closeMemberModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </div>
+        <app-player-card
+          [readOnly]="true"
+          [photoUrl]="member.photoUrl ?? null"
+          [nickname]="member.nickname"
+          [position]="member.position ?? ''"
+          [dominantFoot]="member.dominantFoot ?? ''"
+          [jerseyNumber]="member.jerseyNumber ?? null"
+          [attackRating]="member.attackRating ?? null"
+          [defenseRating]="member.defenseRating ?? null"
+          [physicalRating]="member.physicalRating ?? null"
+          [skillRating]="member.skillRating ?? null"
+        ></app-player-card>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>

@@ -1,5 +1,8 @@
 <div class="player-row">
-  <app-avatar [label]="initials" [size]="34"></app-avatar>
+  <app-crest-badge [crestUrl]="photoUrl" crestShape="CIRCLE" [size]="34" [fallbackLabel]="initials" avatarVariant="gold"></app-crest-badge>
   <span class="name">{{ name }}</span>
   <span class="pos">{{ pos }}</span>
+  <div class="options-btn tap" *ngIf="showOptions" (click)="optionsTap.emit()">
+    <ion-icon name="ellipsis-vertical"></ion-icon>
+  </div>
 </div>

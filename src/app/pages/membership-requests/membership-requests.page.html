@@ -1,0 +1,69 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="PEDIDOS DE ENTRADA" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="loading-state" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="empty-state" *ngIf="requests.length === 0">
+        <ion-icon name="person-add-outline"></ion-icon>
+        <div class="empty-title">Nenhum pedido pendente</div>
+        <div class="empty-sub">Quando alguém pedir pra entrar no time, aparece aqui.</div>
+      </div>
+
+      <div class="requests-list" *ngIf="requests.length > 0">
+        <div class="request-row" *ngFor="let request of requests">
+          <div class="info tap" (click)="viewProfile(request)">
+            <app-crest-badge
+              [crestUrl]="request.photoUrl"
+              crestShape="CIRCLE"
+              [size]="42"
+              [fallbackLabel]="initialsOf(request.nickname)"
+              avatarVariant="gold"
+            ></app-crest-badge>
+            <div class="text">
+              <div class="name">{{ request.nickname }}</div>
+              <div class="pos" *ngIf="request.position">{{ posOf(request.position) }}</div>
+            </div>
+          </div>
+
+          <div class="actions" *ngIf="approvingId !== request.membershipId; else approvingTpl">
+            <button class="approve-btn subscriber tap" (click)="approve(request, 'SUBSCRIBER')">Mensalista</button>
+            <button class="approve-btn casual tap" (click)="approve(request, 'CASUAL')">Avulso</button>
+          </div>
+          <ng-template #approvingTpl>
+            <ion-spinner name="crescent"></ion-spinner>
+          </ng-template>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <ion-modal class="player-detail-modal" [isOpen]="selectedRequest !== null" (didDismiss)="closeProfileModal()">
+    <ng-template>
+      <div class="modal-body" *ngIf="selectedRequest as request">
+        <div class="close-btn tap" (click)="closeProfileModal()">
+          <ion-icon name="close-outline"></ion-icon>
+        </div>
+        <app-player-card
+          [readOnly]="true"
+          [photoUrl]="request.photoUrl ?? null"
+          [nickname]="request.nickname"
+          [position]="request.position ?? ''"
+          [dominantFoot]="request.dominantFoot ?? ''"
+          [jerseyNumber]="request.jerseyNumber ?? null"
+          [attackRating]="request.attackRating ?? null"
+          [defenseRating]="request.defenseRating ?? null"
+          [physicalRating]="request.physicalRating ?? null"
+          [skillRating]="request.skillRating ?? null"
+        ></app-player-card>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

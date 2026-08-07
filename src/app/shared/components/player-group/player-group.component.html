@@ -9,6 +9,9 @@
       [name]="p.name"
       [pos]="p.pos"
       [initials]="p.initials"
+      [photoUrl]="p.photoUrl"
+      [showOptions]="showOptions"
+      (optionsTap)="optionsTap.emit(p)"
     ></app-player-row>
   </div>
 </div>
