@@ -1,0 +1,36 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="ELENCO" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="loading-state" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div class="empty-state" *ngIf="isEmpty">
+        <ion-icon name="people-outline"></ion-icon>
+        <div class="empty-title">Elenco vazio</div>
+        <div class="empty-sub">Ainda não há atletas ativos nesse time.</div>
+      </div>
+
+      <ng-container *ngIf="!isEmpty">
+        <app-player-group
+          *ngIf="subscribers.length > 0"
+          title="MENSALISTAS"
+          color="var(--p-gold)"
+          [players]="subscribers"
+        ></app-player-group>
+        <app-player-group
+          *ngIf="casuals.length > 0"
+          title="AVULSOS"
+          color="var(--p-blue)"
+          [players]="casuals"
+        ></app-player-group>
+      </ng-container>
+    </ng-container>
+  </div>
+</ion-content>

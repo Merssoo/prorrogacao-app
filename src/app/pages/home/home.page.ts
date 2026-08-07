@@ -37,12 +37,18 @@ export class HomePage implements ViewWillEnter {
   onNavItem(label: string): void {
     if (label === 'Times') {
       this.goToHub();
+    } else if (label === 'Elenco') {
+      this.goToSquad();
     }
   }
 
   private goToHub(): void {
     this.activeTeamService.clearActiveTeam();
     this.router.navigateByUrl('/hub');
+  }
+
+  goToSquad(): void {
+    this.router.navigateByUrl('/squad');
   }
 
   goToEvent(): void {

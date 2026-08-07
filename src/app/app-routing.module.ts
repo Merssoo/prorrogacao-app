@@ -50,6 +50,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/home/home.module').then( m => m.HomePageModule)
   },
   {
+    path: 'squad',
+    canActivate: [authGuard],
+    loadChildren: () => import('./pages/squad/squad.module').then( m => m.SquadPageModule)
+  },
+  {
     path: 'create-event',
     canActivate: [authGuard],
     loadChildren: () => import('./pages/create-event/create-event.module').then( m => m.CreateEventPageModule)

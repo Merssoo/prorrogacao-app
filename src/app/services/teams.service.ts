@@ -56,6 +56,22 @@ export interface TeamSearchPage {
   hasNext: boolean;
 }
 
+export interface SquadMember {
+  userId: number;
+  nickname: string;
+  photoUrl?: string;
+  position?: string;
+  secondaryPosition?: string;
+  jerseyNumber?: number;
+  role: Role;
+  type?: MembershipType;
+}
+
+export interface Squad {
+  subscribers: SquadMember[];
+  casuals: SquadMember[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class TeamsService {
   private readonly endpoint = '/teams';
@@ -91,5 +107,9 @@ export class TeamsService {
 
   requestToJoinTeam(teamId: number): Observable<TeamMembership> {
     return this.apiService.post<TeamMembership>(`${this.endpoint}/${teamId}/membership-requests`, {});
+  }
+
+  getSquad(): Observable<Squad> {
+    return this.apiService.get<Squad>(`${this.endpoint}/squad`);
   }
 }

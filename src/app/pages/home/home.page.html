@@ -66,7 +66,7 @@
     </div>
 
     <div class="tiles">
-      <app-tile icon="people-outline" label="Elenco" sub="18 atletas"></app-tile>
+      <app-tile icon="people-outline" label="Elenco" sub="18 atletas" (pressed)="goToSquad()"></app-tile>
       <app-tile icon="star-outline" label="Notas" sub="Avaliar time" (pressed)="goToRatings()"></app-tile>
       <app-tile icon="checkbox-outline" label="Votação" sub="Craque do jogo" (pressed)="goToVoting()"></app-tile>
       <app-tile icon="shuffle-outline" label="Sortear" sub="Times do racha" (pressed)="goToDraft()"></app-tile>
