@@ -34,11 +34,17 @@ export class HomePage implements ViewWillEnter {
     this.menuController.open(MAIN_MENU_ID);
   }
 
+  get isPresident(): boolean {
+    return this.role === 'PRESIDENT';
+  }
+
   onNavItem(label: string): void {
     if (label === 'Times') {
       this.goToHub();
     } else if (label === 'Elenco') {
       this.goToSquad();
+    } else if (label === 'Jogos') {
+      this.router.navigateByUrl('/games');
     }
   }
 
@@ -56,7 +62,7 @@ export class HomePage implements ViewWillEnter {
   }
 
   goToCreateEvent(): void {
-    this.router.navigateByUrl('/create-event');
+    this.router.navigateByUrl('/create-event', { state: { from: '/home' } });
   }
 
   goToRatings(): void {

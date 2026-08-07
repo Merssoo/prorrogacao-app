@@ -18,7 +18,12 @@ export class CreateEventPage {
   dateTime = '26/07 · 15:00';
   confirmationDeadline = '25/07 · 20:00';
 
-  constructor(private readonly router: Router) {}
+  private readonly backUrl: string;
+
+  constructor(private readonly router: Router) {
+    const navigationState = this.router.getCurrentNavigation()?.extras.state as { from?: string } | undefined;
+    this.backUrl = navigationState?.from ?? (history.state as { from?: string } | undefined)?.from ?? '/home';
+  }
 
   get isInternal(): boolean {
     return this.type === 'INTERNAL';
@@ -33,7 +38,7 @@ export class CreateEventPage {
   }
 
   goBack(): void {
-    this.router.navigateByUrl('/home');
+    this.router.navigateByUrl(this.backUrl);
   }
 
   createEvent(): void {

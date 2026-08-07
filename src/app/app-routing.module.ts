@@ -56,6 +56,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/squad/squad.module').then( m => m.SquadPageModule)
   },
   {
+    path: 'games',
+    canActivate: [authGuard, activeTeamGuard],
+    loadChildren: () => import('./pages/games/games.module').then( m => m.GamesPageModule)
+  },
+  {
     path: 'membership-requests',
     canActivate: [authGuard, activeTeamGuard],
     loadChildren: () => import('./pages/membership-requests/membership-requests.module').then( m => m.MembershipRequestsPageModule)

@@ -22,7 +22,7 @@
   <div class="body pad-none-top">
     <div class="row-header">
       <app-eyebrow>PRÓXIMO JOGO</app-eyebrow>
-      <span class="new-event tap" (click)="goToCreateEvent()">
+      <span class="new-event tap" *ngIf="isPresident" (click)="goToCreateEvent()">
         <ion-icon name="add-outline"></ion-icon> Novo evento
       </span>
     </div>

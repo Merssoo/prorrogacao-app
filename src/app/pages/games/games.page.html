@@ -1,0 +1,28 @@
+<ion-header>
+  <div class="header-wrap">
+    <app-top-bar title="JOGOS" [showBack]="true" (back)="goBack()"></app-top-bar>
+  </div>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="screen-content">
+  <div class="body">
+    <div class="row-header">
+      <app-eyebrow>PRÓXIMOS JOGOS</app-eyebrow>
+      <span class="new-event tap" *ngIf="isPresident" (click)="goToCreateEvent()">
+        <ion-icon name="add-outline"></ion-icon> Novo evento
+      </span>
+    </div>
+
+    <div class="empty-state">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <div class="empty-title">Nenhum jogo agendado</div>
+      <div class="empty-sub">Quando um jogo for criado, aparece aqui.</div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="footer-wrap">
+    <app-bottom-nav active="Jogos" (itemClick)="onNavItem($event)"></app-bottom-nav>
+  </div>
+</ion-footer>
